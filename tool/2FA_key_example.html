@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>2FA 密钥生成器</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* 容器样式 */
+        .container {
+            border-radius: 15px;
+            padding: 30px;
+            background-color: white;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        /* 输入框样式 */
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #1e90ff;
+            outline: none;
+        }
+
+        /* 按钮样式 */
+        button {
+            background-color: #1e90ff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.2s;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #1c86ee;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* 密钥显示区域样式 */
+        .secret-display-container {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
+        .secret-display {
+            border: 2px solid #1e90ff;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            display: inline-block;
+            background-color: #f9f9f9;
+            color: #000; /* 密钥字体颜色改为黑色 */
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* 二维码容器样式 */
+        #qrcode {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        /* 隐藏元素样式 */
+        .hidden {
+            display: none;
+        }
+
+        /* 提示信息样式 */
+        .alert {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .alert.show {
+            opacity: 1;
+        }
+
+        .alert.error {
+            background-color: #ffebee;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+
+        .alert.success {
+            background-color: #e8f5e9;
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.2.0/sha.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>2FA 密钥生成器</h1>
+        <div>
+            <label for="username">用户名：</label>
+            <input type="text" id="username" placeholder="请输入用户名">
+        </div>
+        <div class="secret-display-container hidden" id="secret-container">
+            您的2FA密钥是：<br>
+            <span id="secret-display" class="secret-display"></span>
+        </div>
+        <button id="generate-key">生成2FA密钥</button>
+        <button id="copy-key" class="hidden">复制密钥</button>
+        <div id="qrcode" class="hidden"></div>
+        <div id="alert-message" class="alert"></div>
+    </div>
+    
+    <script>
+        function generateQRCode(username, secret) {
+            const qrcodeContainer = document.getElementById('qrcode');
+            qrcodeContainer.innerHTML = "";  // 清空之前的二维码
+            new QRCode(qrcodeContainer, {
+                text: "otpauth://totp/" + username + "?secret=" + secret,
+                width: 128,
+                height: 128
+            });
+        }
+
+        function generateRandomKey() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            const randomValues = new Uint8Array(32);
+            window.crypto.getRandomValues(randomValues);
+            let result = '';
+            randomValues.forEach(value => {
+                result += characters[value % characters.length];
+            });
+            return result;
+        }
+
+        function toggleElements(show) {
+            document.getElementById('secret-container').classList.toggle('hidden', !show);
+            document.getElementById('copy-key').classList.toggle('hidden', !show);
+            document.getElementById('qrcode').classList.toggle('hidden', !show);
+        }
+
+        function showAlert(message, isError = true) {
+            const alertElement = document.getElementById('alert-message');
+            alertElement.textContent = message;
+            alertElement.className = `alert ${isError ? 'error' : 'success'} show`;
+            setTimeout(() => {
+                alertElement.classList.remove('show');
+            }, 3000); // 3秒后自动隐藏
+        }
+
+        document.getElementById('generate-key').addEventListener('click', function() {
+            const username = document.getElementById('username').value.trim();
+            if (!username) {
+                showAlert('请输入用户名');
+                return;
+            }
+            const secret = generateRandomKey();  // 生成32位密钥
+            document.getElementById('secret-display').textContent = secret;
+            generateQRCode(username, secret);  // 生成二维码
+            toggleElements(true);
+            document.getElementById('copy-key').focus();
+            showAlert('密钥已生成！', false);
+        });
+
+        document.getElementById('copy-key').addEventListener('click', function() {
+            const secretText = document.getElementById('secret-display').textContent;
+            navigator.clipboard.writeText(secretText).then(function() {
+                showAlert('密钥已复制到剪贴板！', false);
+            }, function(err) {
+                showAlert('复制失败，请手动复制！');
+                console.error('复制失败！', err);
+            });
+        });
+    </script>
+</body>
+</html>
