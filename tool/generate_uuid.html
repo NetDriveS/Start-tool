@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机生成UUID</title>
+    <style>
+        /* 全局样式 */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            padding: 30px;
+            border-radius: 15px;
+            background-color: white;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        /* UUID 显示区域 */
+        #uuid {
+            font-size: 1.2em;
+            margin: 20px 0;
+            word-wrap: break-word;
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            color: #333;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+        }
+
+        /* 按钮容器 */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* 按钮样式 */
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #1e90ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #1c86ee;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* 提示信息样式 */
+        .alert {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .alert.show {
+            opacity: 1;
+        }
+
+        .alert.success {
+            background-color: #e8f5e9;
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+        }
+
+        .alert.error {
+            background-color: #ffebee;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <h1>随机生成UUID</h1>
+        <div id="uuid">点击按钮生成UUID</div>
+        <div class="button-container">
+            <button onclick="generateUUID()">生成UUID</button>
+            <button onclick="copyUUID()">复制UUID</button>
+        </div>
+        <div id="alert-message" class="alert"></div>
+    </div>
+
+    <script>
+        // 生成UUID
+        function generateUUID() {
+            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16).toUpperCase();
+            });
+            document.getElementById('uuid').textContent = uuid;
+            showAlert('UUID 已生成！', false);
+        }
+
+        // 复制UUID
+        function copyUUID() {
+            const uuidText = document.getElementById('uuid').textContent;
+            if (uuidText === "点击按钮生成UUID") {
+                showAlert('请先生成UUID！');
+                return;
+            }
+            navigator.clipboard.writeText(uuidText).then(function() {
+                showAlert('UUID 已复制到剪贴板！', false);
+            }, function(err) {
+                showAlert('复制失败，请手动复制！');
+                console.error('复制失败！', err);
+            });
+        }
+
+        // 显示提示信息
+        function showAlert(message, isError = true) {
+            const alertElement = document.getElementById('alert-message');
+            alertElement.textContent = message;
+            alertElement.className = `alert ${isError ? 'error' : 'success'} show`;
+            setTimeout(() => {
+                alertElement.classList.remove('show');
+            }, 3000); // 3秒后自动隐藏
+        }
+    </script>
+</body>
+</html>
