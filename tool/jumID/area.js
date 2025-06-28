@@ -1,7 +1,6 @@
 /**
  * @file area.js
  * @description 行政区划（省市县三级）编码列表
- * @reference http://www.mca.gov.cn/article/sj/xzqh/1980/
  */
 export default new Set([
   110101, 110102, 110103, 110104, 110105, 110106, 110107, 110108, 110109,
