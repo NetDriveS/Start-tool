@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>英文字符大小写转换工具</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        textarea#input-text {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            resize: vertical;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-button {
+            padding: 10px 16px;
+            font-size: 14px;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .convert-button {
+            border-color: #2196F3;
+            background-color: #e3f2fd;
+        }
+
+        .copy-button {
+            border-color: #9E9E9E;
+            background-color: #eeeeee;
+        }
+
+        .clear-button {
+            border-color: #D32F2F;
+            background-color: #ffcdd2;
+        }
+
+        .action-button:hover {
+            opacity: 0.9;
+        }
+
+        .option-box {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        .status-bar {
+            width: 100%;
+            height: 36px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #555;
+            background-color: #f5f5f5;
+            transition: all 0.3s ease;
+        }
+
+        .status-bar.success {
+            border-color: #4CAF50;
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-bar.error {
+            border-color: #D32F2F;
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+
+        .status-bar.info {
+            border-color: #9E9E9E;
+            background-color: #eeeeee;
+            color: #757575;
+        }
+
+        textarea#output-text {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            resize: vertical;
+            background-color: #fafafa;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>英文字符大小写转换工具</h2>
+        <textarea id="input-text" placeholder="请输入英文文本..."></textarea>
+
+        <!-- 操作按钮行 -->
+        <div class="button-row">
+            <div class="action-buttons">
+                <button class="action-button convert-button" onclick="convert()">转化</button>
+                <button class="action-button copy-button" onclick="copyText()">复制</button>
+                <button class="action-button clear-button" onclick="clearText()">清空</button>
+            </div>
+            <div class="option-box">
+                <select id="conversion-type">
+                    <option value="uppercase">全大写</option>
+                    <option value="lowercase">全小写</option>
+                    <option value="toggleCase">反转大小写</option>
+                    <option value="capitalizeWords">单词首字母大写</option>
+                    <option value="capitalizeSentences">句首首字母大写</option>
+                    <option value="spaceToUnderscore">空格转下划线</option>
+                    <option value="underscoreToSpace">下划线转空格</option>
+                    <option value="camelToUnderscore">驼峰转下划线</option>
+                    <option value="underscoreToCamel">下划线转驼峰</option>
+                    <option value="underscoreToHyphen">下划线转中划线</option>
+                    <option value="hyphenToUnderscore">中划线转下划线</option>
+                    <option value="underscoreToDot">下划线转小数点</option>
+                    <option value="dotToUnderscore">小数点转下划线</option>
+                    <option value="underscoreToComma">下划线转逗号</option>
+                    <option value="commaToUnderscore">逗号转下划线</option>
+                    <option value="lineFirstLower">每行首字母小写</option>
+                    <option value="lineFirstUpper">每行首字母大写</option>
+                    <option value="fullwidthToHalfwidth">全角转半角</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 状态框 -->
+        <div class="status-bar" id="status-bar">就绪</div>
+
+        <!-- 输出框 -->
+        <textarea id="output-text" readonly></textarea>
+    </div>
+
+    <script>
+        function convert() {
+            const type = document.getElementById('conversion-type').value;
+            const input = document.getElementById('input-text').value;
+            let output = '';
+
+            switch (type) {
+                case 'uppercase':
+                    output = input.toUpperCase();
+                    break;
+                case 'lowercase':
+                    output = input.toLowerCase();
+                    break;
+                case 'toggleCase':
+                    output = input.split('').map(c => {
+                        return c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase();
+                    }).join('');
+                    break;
+                case 'capitalizeWords':
+                    output = input.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+                    break;
+                case 'capitalizeSentences':
+                    const sentences = input.split(/(?<=[.!?])\s+/);
+                    output = sentences.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+                    break;
+                case 'spaceToUnderscore':
+                    output = input.replace(/\s+/g, '_');
+                    break;
+                case 'underscoreToSpace':
+                    output = input.replace(/_/g, ' ');
+                    break;
+                case 'camelToUnderscore':
+                    output = input.replace(/([A-Z])/g, '_$1').toLowerCase();
+                    break;
+                case 'underscoreToCamel':
+                    output = input.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+                    break;
+                case 'underscoreToHyphen':
+                    output = input.replace(/_/g, '-');
+                    break;
+                case 'hyphenToUnderscore':
+                    output = input.replace(/-/g, '_');
+                    break;
+                case 'underscoreToDot':
+                    output = input.replace(/_/g, '.');
+                    break;
+                case 'dotToUnderscore':
+                    output = input.replace(/\./g, '_');
+                    break;
+                case 'underscoreToComma':
+                    output = input.replace(/_/g, ',');
+                    break;
+                case 'commaToUnderscore':
+                    output = input.replace(/,/g, '_');
+                    break;
+                case 'lineFirstLower':
+                    const linesLower = input.split('\n').map(line => line.charAt(0).toLowerCase() + line.slice(1));
+                    output = linesLower.join('\n');
+                    break;
+                case 'lineFirstUpper':
+                    const linesUpper = input.split('\n').map(line => line.charAt(0).toUpperCase() + line.slice(1));
+                    output = linesUpper.join('\n');
+                    break;
+                case 'fullwidthToHalfwidth':
+                    output = input.replace(/[\uff01-\uff5e]/g, c => {
+                        return String.fromCharCode(c.charCodeAt(0) - 0xFEE0);
+                    });
+                    break;
+                default:
+                    output = input;
+            }
+
+            document.getElementById('output-text').value = output;
+            showStatus('success', '转换完成');
+        }
+
+        function copyText() {
+            const output = document.getElementById('output-text');
+            navigator.clipboard.writeText(output.value)
+                .then(() => {
+                    showStatus('info', '已复制');
+                })
+                .catch(() => {
+                    showStatus('error', '复制失败');
+                });
+        }
+
+        function clearText() {
+            document.getElementById('input-text').value = '';
+            document.getElementById('output-text').value = '';
+            showStatus('error', '已清空');
+        }
+
+        function showStatus(type, message) {
+            const status = document.getElementById('status-bar');
+            status.className = 'status-bar ' + type;
+            status.textContent = message;
+            setTimeout(() => {
+                status.className = 'status-bar';
+                status.textContent = '就绪';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
