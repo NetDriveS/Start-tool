@@ -23,7 +23,7 @@
 
 ### 1. 克隆项目  
 ```bash
-git clone https://github.com/Anzeacc10/Start-tool.git
+git clone https://github.com/NetDriveS/Start-tool.git
 cd Start-tool
 ```
 
@@ -47,7 +47,7 @@ cd Start-tool
 ## 🤝 贡献指南  
 
 1. **提交 Issue**  
-   - 功能建议：[点击提交](https://github.com/Anzeacc10/Start-tool/issues/new)  
+   - 功能建议：[点击提交](https://github.com/NetDriveS/Start-tool/issues/new)  
    - Bug 反馈：请附上复现步骤与浏览器信息  
 
 2. **Pull Request**  
