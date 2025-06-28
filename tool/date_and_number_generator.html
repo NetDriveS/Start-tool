@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日期和编号生成</title>
+    <style>
+        /* 全局样式 */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f3f3f3, #e2e2e2);
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
+            color: #ffffff;
+        }
+
+        /* 容器样式 */
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode .container {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+        /* 标题样式 */
+        h1 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+
+        body.dark-mode h1 {
+            color: #ffffff;
+        }
+
+        /* 显示区域样式 */
+        #display {
+            font-size: 2em;
+            margin: 20px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            color: #333;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode #display {
+            background-color: #444444;
+            border-color: #666666;
+            color: #ffffff;
+        }
+
+        /* 按钮样式 */
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 10px;
+            color: white;
+            background-color: #1e90ff;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #1c86ee;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .dark-mode-toggle {
+            background-color: #555555;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: #444444;
+        }
+
+        /* 提示信息样式 */
+        .alert {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .alert.show {
+            opacity: 1;
+        }
+
+        .alert.success {
+            background-color: #e8f5e9;
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+        }
+
+        .alert.error {
+            background-color: #ffebee;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>日期和编号生成</h1>
+        <div id="display">点击按钮生成编号</div>
+        <button onclick="generateInitial()">生成初始编号</button>
+        <button onclick="incrementNumber()">编号后缀+1</button>
+        <button onclick="copyToClipboard()">复制当前编号</button>
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">切换暗色模式</button>
+        <div id="alert-message" class="alert"></div>
+    </div>
+
+    <script>
+        let counter = 0;
+
+        // 格式化日期和编号
+        function formatDate(counter) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            const formattedDate = `${year}${month}${day}${counter.toString().padStart(5, '0')}`;
+            return formattedDate;
+        }
+
+        // 显示日期和编号
+        function displayDate() {
+            document.getElementById('display').textContent = formatDate(counter);
+        }
+
+        // 生成初始编号
+        function generateInitial() {
+            counter = 0;
+            displayDate();
+            showAlert('已生成初始编号！', false);
+        }
+
+        // 编号后缀+1
+        function incrementNumber() {
+            counter++;
+            displayDate();
+            showAlert('编号后缀已增加！', false);
+        }
+
+        // 复制到剪贴板
+        function copyToClipboard() {
+            const displayText = document.getElementById('display').textContent;
+            navigator.clipboard.writeText(displayText).then(function() {
+                showAlert('编号已复制到剪贴板！', false);
+            }, function(err) {
+                showAlert('复制失败，请手动复制！');
+                console.error('复制失败！', err);
+            });
+        }
+
+        // 切换暗色模式
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // 显示提示信息
+        function showAlert(message, isError = true) {
+            const alertElement = document.getElementById('alert-message');
+            alertElement.textContent = message;
+            alertElement.className = `alert ${isError ? 'error' : 'success'} show`;
+            setTimeout(() => {
+                alertElement.classList.remove('show');
+            }, 3000); // 3秒后自动隐藏
+        }
+
+        // 初始化显示
+        displayDate();
+    </script>
+</body>
+</html>
