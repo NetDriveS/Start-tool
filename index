@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小工具导航页</title>
+    <style>
+        /* 公告栏样式 */
+        .announcement {
+            background-color: #3683f7; /* 蓝色背景 */
+            color: #ffffff; /* 白色文字 */
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f3f3f3, #e2e2e2);
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
+            color: #ffffff;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode .container {
+            background-color: #333333;
+            color: #ffffff;
+        }
+
+        body.dark-mode .announcement {
+            background-color: #005bb5; /* 深色模式下的背景颜色 */
+            color: #ffffff; /* 深色模式下的文字颜色 */
+        }
+
+        h1, h4 {
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+
+        a {
+            display: block;
+            margin: 10px 0;
+            padding: 12px 20px;
+            font-size: 16px;
+            text-decoration: none;
+            color: white;
+            background-color: #3683f7;
+            border-radius: 8px;
+            text-align: center;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        a:hover {
+            background-color: #005bb5;
+            transform: translateY(-2px);
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            font-size: 16px;
+            color: white;
+            background-color: #3683f7;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .page-number {
+            margin: 0 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 公告栏 -->
+    <div class="announcement" id="announcement">
+        <p>欢迎访问小工具导航页！</p>
+    </div>
+
+    <div class="container">
+        <h1>小工具导航页</h1>
+        <h4>这些工具完全免费，无广告，数据均在本地完成哦！欢迎使用！</h4>
+
+        <div class="page active" id="page1">
+            <a href="https://netdrives.rth1.xyz/tool/random_number.html" target="_blank">生成随机数</a>
+            <a href="https://netdrives.rth1.xyz/tool/current_time.html" target="_blank">获取当前时间</a>
+            <a href="https://netdrives.rth1.xyz/tool/generate_uuid.html" target="_blank">生成UUID</a>    
+            <a href="https://netdrives.rth1.xyz/tool/2FA_key_example.html" target="_blank">2FA生成器</a>    
+        </div>
+
+        <div class="page" id="page2">
+            <a href="https://netdrives.rth1.xyz/tool/date_and_number_generator.html" target="_blank">日期和编号生成</a>
+            <a href="https://netdrives.rth1.xyz/tool/jumID/index.html" target="_blank">身份证检验器</a>
+            <a href="https://netdrives.rth1.xyz/tool/generate_QRcode.html" target="_blank">生成二维码</a>
+        </div>
+
+        <div class="pagination">
+            <button onclick="prevPage()" id="prev-btn">上一页</button>
+            <span class="page-number" id="page-number">1 / 2</span>
+            <button onclick="nextPage()" id="next-btn">下一页</button>
+        </div>
+
+        <button onclick="toggleDarkMode()">切换暗色模式</button>
+    </div>
+
+    <script>
+        // 暗色模式切换
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        // 分页功能
+        let currentPage = 1;
+        const totalPages = 2;
+
+        function showPage(page) {
+            for (let i = 1; i <= totalPages; i++) {
+                document.getElementById('page' + i).classList.remove('active');
+            }
+            document.getElementById('page' + page).classList.add('active');
+            document.getElementById('page-number').textContent = page + " / " + totalPages;
+
+            // 更新按钮状态
+            document.getElementById('prev-btn').disabled = page === 1;
+            document.getElementById('next-btn').disabled = page === totalPages;
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        }
+
+        // 公告栏自动隐藏
+        function hideAnnouncement() {
+            document.getElementById('announcement').style.display = 'none';
+        }
+
+        // 初始化
+        window.onload = function() {
+            showPage(currentPage); // 初始化分页
+            setTimeout(hideAnnouncement, 5000); // 5秒后自动隐藏公告栏
+        };
+    </script>
+</body>
+</html>
