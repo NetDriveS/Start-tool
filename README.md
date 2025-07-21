@@ -30,7 +30,7 @@ cd Start-tool
 
 ### 2. 运行方式  
 - 打开 `index.html` 文件即可使用  
-- 所有功能 **无需联网** 即可运行  
+- 目前所有功能 **无需联网** 即可运行  
 - 支持现代浏览器（Chrome/Firefox/Safari/Edge）  
 
 ---
