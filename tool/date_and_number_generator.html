@@ -3,146 +3,421 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日期和编号生成</title>
+    <title>现代化日期和编号生成器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f3f3f3, #e2e2e2);
-            margin: 0;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        body.dark-mode {
-            background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
-            color: #ffffff;
-        }
-
-        /* 容器样式 */
-        .container {
-            text-align: center;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 90%;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        body.dark-mode .container {
-            background-color: #333333;
-            color: #ffffff;
-        }
-
-        /* 标题样式 */
-        h1 {
-            font-size: 24px;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            transition: color 0.3s;
-        }
-
-        body.dark-mode h1 {
-            color: #ffffff;
-        }
-
-        /* 显示区域样式 */
-        #display {
-            font-size: 2em;
-            margin: 20px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            background-color: #f9f9f9;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #333;
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            transition: background-color 0.3s, color 0.3s;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+            transition: background-color 0.5s ease;
         }
-
+        
+        body.dark-mode {
+            background: linear-gradient(135deg, #141e30 0%, #243b55 100%);
+        }
+        
+        /* 装饰性背景元素 */
+        .background-element {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            z-index: -1;
+            filter: blur(30px);
+        }
+        
+        .element-1 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, #4e54c8, #8f94fb);
+            top: 10%;
+            left: 5%;
+            animation: float 25s infinite ease-in-out;
+        }
+        
+        .element-2 {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            bottom: 15%;
+            right: 8%;
+            animation: float 20s infinite ease-in-out reverse;
+        }
+        
+        .element-3 {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            top: 30%;
+            right: 20%;
+            animation: float 18s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-20px, 15px); }
+            50% { transform: translate(10px, -20px); }
+            75% { transform: translate(15px, 10px); }
+        }
+        
+        /* 主卡片样式 */
+        .main-card {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            padding: 40px;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            z-index: 10;
+        }
+        
+        body.dark-mode .main-card {
+            background: rgba(30, 30, 40, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header {
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        body.dark-mode .header h1 {
+            background: linear-gradient(90deg, #8f94fb, #4e54c8);
+        }
+        
+        .header p {
+            font-size: 1rem;
+            color: #718096;
+            margin-top: 10px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+        
+        body.dark-mode .header p {
+            color: #a0aec0;
+        }
+        
+        /* 显示区域样式 - 修复暗色模式问题 */
+        .display-container {
+            margin: 25px 0;
+            position: relative;
+        }
+        
+        #display {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            padding: 25px 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+        
         body.dark-mode #display {
-            background-color: #444444;
-            border-color: #666666;
-            color: #ffffff;
+            background: #1a202c;
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
         }
-
-        /* 按钮样式 */
-        button {
-            padding: 12px 24px;
-            font-size: 1em;
-            cursor: pointer;
-            margin: 10px;
+        
+        .display-label {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #4e54c8;
             color: white;
-            background-color: #1e90ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        body.dark-mode .display-label {
+            background: #8f94fb;
+        }
+        
+        /* 按钮区域 */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 30px 0 20px;
+        }
+        
+        .btn {
+            padding: 15px;
+            font-size: 1rem;
             border: none;
-            border-radius: 8px;
-            transition: background-color 0.3s, transform 0.2s;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
-
-        button:hover {
-            background-color: #1c86ee;
-            transform: translateY(-2px);
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #4e54c8, #8f94fb);
+            color: white;
         }
-
-        button:active {
-            transform: translateY(0);
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, #11998e, #38ef7d);
+            color: white;
         }
-
-        .dark-mode-toggle {
-            background-color: #555555;
+        
+        .btn-info {
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            color: #2d3748;
         }
-
-        .dark-mode-toggle:hover {
-            background-color: #444444;
+        
+        .btn-dark {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
         }
-
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        /* 计数器显示 */
+        .counter-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            background: rgba(113, 128, 150, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+        }
+        
+        body.dark-mode .counter-display {
+            background: rgba(160, 174, 192, 0.1);
+        }
+        
+        .counter-label {
+            font-size: 1rem;
+            color: #718096;
+            font-weight: 600;
+        }
+        
+        body.dark-mode .counter-label {
+            color: #a0aec0;
+        }
+        
+        .counter-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4e54c8;
+            font-family: 'Courier New', monospace;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        body.dark-mode .counter-value {
+            color: #8f94fb;
+        }
+        
         /* 提示信息样式 */
         .alert {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.95rem;
             text-align: center;
             opacity: 0;
-            transition: opacity 0.5s ease-in-out;
+            transition: opacity 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
         }
-
+        
         .alert.show {
             opacity: 1;
+            max-height: 100px;
         }
-
+        
         .alert.success {
-            background-color: #e8f5e9;
-            border: 1px solid #2ecc71;
+            background-color: rgba(46, 204, 113, 0.15);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: #27ae60;
+        }
+        
+        body.dark-mode .alert.success {
+            background-color: rgba(46, 204, 113, 0.25);
+            border: 1px solid rgba(46, 204, 113, 0.5);
             color: #2ecc71;
         }
-
+        
         .alert.error {
-            background-color: #ffebee;
-            border: 1px solid #e74c3c;
+            background-color: rgba(231, 76, 60, 0.15);
+            border: 1px solid rgba(231, 76, 60, 0.3);
             color: #e74c3c;
+        }
+        
+        body.dark-mode .alert.error {
+            background-color: rgba(231, 76, 60, 0.25);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+            color: #ff6b6b;
+        }
+        
+        /* 编号格式说明 */
+        .format-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(113, 128, 150, 0.1);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: #718096;
+            line-height: 1.6;
+        }
+        
+        body.dark-mode .format-info {
+            background: rgba(160, 174, 192, 0.1);
+            color: #a0aec0;
+        }
+        
+        .format-info strong {
+            color: #4e54c8;
+        }
+        
+        body.dark-mode .format-info strong {
+            color: #8f94fb;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .main-card {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            #display {
+                font-size: 1.8rem;
+                padding: 20px 15px;
+            }
+            
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .counter-value {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            #display {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>日期和编号生成</h1>
-        <div id="display">点击按钮生成编号</div>
-        <button onclick="generateInitial()">生成初始编号</button>
-        <button onclick="incrementNumber()">编号后缀+1</button>
-        <button onclick="copyToClipboard()">复制当前编号</button>
-        <button class="dark-mode-toggle" onclick="toggleDarkMode()">切换暗色模式</button>
+    <div class="background-element element-1"></div>
+    <div class="background-element element-2"></div>
+    <div class="background-element element-3"></div>
+    
+    <div class="main-card">
+        <div class="header">
+            <h1><i class="fas fa-id-badge"></i> 日期和编号生成器</h1>
+            <p>生成基于日期的唯一编号，支持后缀递增和复制功能</p>
+        </div>
+        
+        <div class="counter-display">
+            <span class="counter-label">当前后缀值:</span>
+            <span class="counter-value" id="counter-value">0</span>
+        </div>
+        
+        <div class="display-container">
+            <div class="display-label">生成的编号</div>
+            <div id="display">2024072100000</div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn btn-primary" onclick="generateInitial()">
+                <i class="fas fa-plus-circle"></i> 生成初始编号
+            </button>
+            <button class="btn btn-secondary" onclick="incrementNumber()">
+                <i class="fas fa-plus"></i> 后缀+1
+            </button>
+            <button class="btn btn-info" onclick="copyToClipboard()">
+                <i class="fas fa-copy"></i> 复制编号
+            </button>
+            <button class="btn btn-dark" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i> 暗色模式
+            </button>
+        </div>
+        
+        <div class="format-info">
+            <strong>编号格式说明：</strong> 前8位为日期（YYYYMMDD），后5位为递增编号（从00000开始）
+        </div>
+        
         <div id="alert-message" class="alert"></div>
     </div>
 
     <script>
         let counter = 0;
+        let currentId = "";
 
         // 格式化日期和编号
         function formatDate(counter) {
@@ -156,7 +431,9 @@
 
         // 显示日期和编号
         function displayDate() {
-            document.getElementById('display').textContent = formatDate(counter);
+            currentId = formatDate(counter);
+            document.getElementById('display').textContent = currentId;
+            document.getElementById('counter-value').textContent = counter;
         }
 
         // 生成初始编号
@@ -164,6 +441,10 @@
             counter = 0;
             displayDate();
             showAlert('已生成初始编号！', false);
+            
+            // 添加动画效果
+            const display = document.getElementById('display');
+            display.style.animation = 'pulse 0.5s';
         }
 
         // 编号后缀+1
@@ -171,15 +452,27 @@
             counter++;
             displayDate();
             showAlert('编号后缀已增加！', false);
+            
+            // 添加动画效果
+            const display = document.getElementById('display');
+            display.style.animation = 'pulse 0.5s';
         }
 
         // 复制到剪贴板
         function copyToClipboard() {
-            const displayText = document.getElementById('display').textContent;
-            navigator.clipboard.writeText(displayText).then(function() {
+            if (!currentId) {
+                showAlert('请先生成编号！', true);
+                return;
+            }
+            
+            navigator.clipboard.writeText(currentId).then(function() {
                 showAlert('编号已复制到剪贴板！', false);
+                
+                // 添加复制成功动画
+                const display = document.getElementById('display');
+                display.style.animation = 'copyFlash 0.5s';
             }, function(err) {
-                showAlert('复制失败，请手动复制！');
+                showAlert('复制失败，请手动复制！', true);
                 console.error('复制失败！', err);
             });
         }
@@ -187,6 +480,19 @@
         // 切换暗色模式
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
+            
+            const toggleBtn = document.querySelector('.btn-dark');
+            const icon = toggleBtn.querySelector('i');
+            
+            if(document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                toggleBtn.innerHTML = '<i class="fas fa-sun"></i> 亮色模式';
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                toggleBtn.innerHTML = '<i class="fas fa-moon"></i> 暗色模式';
+            }
         }
 
         // 显示提示信息
@@ -196,8 +502,23 @@
             alertElement.className = `alert ${isError ? 'error' : 'success'} show`;
             setTimeout(() => {
                 alertElement.classList.remove('show');
-            }, 3000); // 3秒后自动隐藏
+            }, 3000);
         }
+
+        // 添加动画关键帧
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.02); }
+                100% { transform: scale(1); }
+            }
+            @keyframes copyFlash {
+                0%, 100% { background-color: inherit; }
+                50% { background-color: rgba(46, 204, 113, 0.3); }
+            }
+        `;
+        document.head.appendChild(style);
 
         // 初始化显示
         displayDate();
