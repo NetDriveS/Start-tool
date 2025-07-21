@@ -4,165 +4,527 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小工具导航页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 公告栏样式 */
-        .announcement {
-            background-color: #3683f7; /* 蓝色背景 */
-            color: #ffffff; /* 白色文字 */
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: relative;
+        /* 重置默认样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
+        /* 整体布局 */
         body {
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #f3f3f3, #e2e2e2);
-            margin: 0;
-            transition: background-color 0.3s, color 0.3s;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            padding: 20px;
+            transition: background 0.3s ease;
         }
 
         body.dark-mode {
-            background: linear-gradient(135deg, #1e1e1e, #2c2c2c);
-            color: #ffffff;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2c2c2c 100%);
         }
 
-        .container {
+        /* 公告栏样式 */
+        .announcement {
+            background: linear-gradient(to right, #3683f7, #5a9cff);
+            color: #ffffff;
+            padding: 15px 25px;
             text-align: center;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 90%;
-            transition: background-color 0.3s, color 0.3s;
+            margin-bottom: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(54, 131, 247, 0.25);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease;
         }
 
-        body.dark-mode .container {
-            background-color: #333333;
-            color: #ffffff;
+        .announcement i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .announcement p {
+            font-size: 1rem;
+            font-weight: 500;
         }
 
         body.dark-mode .announcement {
-            background-color: #005bb5; /* 深色模式下的背景颜色 */
-            color: #ffffff; /* 深色模式下的文字颜色 */
+            background: linear-gradient(to right, #005bb5, #2a7de1);
+            box-shadow: 0 4px 12px rgba(0, 91, 181, 0.3);
         }
 
-        h1, h4 {
-            margin-bottom: 20px;
+        /* 主容器 */
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            animation: slideUp 0.5s ease;
+        }
+
+        body.dark-mode .container {
+            background-color: #333;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 头部区域 */
+        .header {
+            padding: 20px 25px 15px;
+            text-align: center;
+            position: relative;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        body.dark-mode .header {
+            background-color: #333;
+            border-color: #444;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
             transition: color 0.3s;
         }
 
-        a {
-            display: block;
-            margin: 10px 0;
-            padding: 12px 20px;
-            font-size: 16px;
-            text-decoration: none;
-            color: white;
-            background-color: #3683f7;
-            border-radius: 8px;
-            text-align: center;
-            transition: background-color 0.3s, transform 0.2s;
+        body.dark-mode .header h1 {
+            color: #f0f0f0;
         }
 
-        a:hover {
-            background-color: #005bb5;
-            transform: translateY(-2px);
+        .header h4 {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #666;
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.5;
+            transition: color 0.3s;
         }
 
-        button {
-            margin-top: 20px;
-            padding: 12px 24px;
-            font-size: 16px;
-            color: white;
-            background-color: #3683f7;
+        body.dark-mode .header h4 {
+            color: #aaa;
+        }
+
+        /* 模式切换按钮 */
+        .mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f0f0f0;
             border: none;
-            border-radius: 8px;
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        button:hover {
-            background-color: #005bb5;
+        .mode-toggle:hover {
+            background: #e0e0e0;
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
-        button:active {
-            transform: translateY(0);
+        .mode-toggle:active {
+            transform: translateY(1px);
         }
 
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
+        body.dark-mode .mode-toggle {
+            background: #444;
+            color: #f0f0f0;
+        }
+
+        /* 工具区域 */
+        .tools-area {
+            padding: 20px 25px;
         }
 
         .page {
             display: none;
+            animation: fadeIn 0.4s ease;
         }
 
         .page.active {
             display: block;
         }
 
+        /* 工具按钮 */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        a.tool-btn {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            text-decoration: none;
+            color: #333;
+            background: #f8f8f8;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #eee;
+            position: relative;
+            overflow: hidden;
+        }
+
+        a.tool-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            background: #3683f7;
+            color: white;
+            border-color: #3683f7;
+        }
+
+        a.tool-btn:hover .tool-icon {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tool-icon {
+            width: 40px;
+            height: 40px;
+            background: #eef5ff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .tool-icon i {
+            color: #3683f7;
+            font-size: 1.2rem;
+        }
+
+        .tool-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .tool-info h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .tool-info p {
+            font-size: 0.85rem;
+            color: #666;
+            opacity: 0.8;
+        }
+
+        body.dark-mode a.tool-btn {
+            background: #3a3a3a;
+            border-color: #444;
+            color: #f0f0f0;
+        }
+
+        body.dark-mode a.tool-btn .tool-icon {
+            background: rgba(54, 131, 247, 0.15);
+        }
+
+        body.dark-mode a.tool-btn .tool-icon i {
+            color: #5a9cff;
+        }
+
+        body.dark-mode a.tool-btn .tool-info p {
+            color: #bbb;
+        }
+
+        body.dark-mode a.tool-btn:hover {
+            background: #005bb5;
+            border-color: #005bb5;
+        }
+
+        /* 分页区域 */
         .pagination {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 20px;
+            padding: 15px 25px;
+            border-top: 1px solid #f0f0f0;
+            transition: border-color 0.3s;
+        }
+
+        body.dark-mode .pagination {
+            border-color: #444;
+        }
+
+        .page-btn {
+            padding: 10px 20px;
+            font-size: 0.95rem;
+            color: #333;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .page-btn:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        body.dark-mode .page-btn {
+            background: #444;
+            color: #f0f0f0;
         }
 
         .page-number {
-            margin: 0 10px;
-            font-size: 16px;
+            margin: 0 15px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #666;
+            transition: color 0.3s;
+        }
+
+        body.dark-mode .page-number {
+            color: #aaa;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 520px) {
+            .container {
+                max-width: 95vw;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .header h4 {
+                font-size: 0.9rem;
+            }
+            
+            .tool-grid {
+                gap: 12px;
+            }
+            
+            a.tool-btn {
+                padding: 14px 18px;
+                font-size: 1rem;
+            }
+            
+            .tool-icon {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .page-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
 <body>
     <!-- 公告栏 -->
     <div class="announcement" id="announcement">
-        <p>欢迎访问小工具导航页！</p>
+        <i class="fas fa-bullhorn"></i>
+        <p>欢迎访问小工具导航页！所有工具完全免费，无广告，数据均在本地处理</p>
     </div>
 
     <div class="container">
-        <h1>小工具导航页</h1>
-        <h4>这些工具完全免费，无广告，数据均在本地完成哦！欢迎使用！</h4>
-
-        <div class="page active" id="page1">
-            <a href="tool/random_number.html" target="_blank">生成随机数</a>
-            <a href="tool/current_time.html" target="_blank">获取当前时间</a>
-            <a href="tool/generate_uuid.html" target="_blank">生成UUID</a>    
-            <a href="tool/2FA_key_example.html" target="_blank">2FA生成器</a>    
-            <a href="tool/date_and_number_generator.html" target="_blank">日期和编号生成</a>
+        <div class="header">
+            <h1>小工具导航页</h1>
+            <h4>这些工具完全免费，无广告，数据均在本地完成哦！欢迎使用！</h4>
+            
+            <button class="mode-toggle" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i>
+                暗色模式
+            </button>
         </div>
+        
+        <div class="tools-area">
+            <div class="page active" id="page1">
+                <div class="tool-grid">
+                    <a href="https://netdrives.rth1.xyz/tool/random_number.html" target="_blank" class="tool-btn">
+                        <div class="tool-icon">
+                            <i class="fas fa-dice"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3>生成随机数</h3>
+                            <p>生成指定范围内的随机数</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://netdrives.rth1.xyz/tool/current_time.html" target="_blank" class="tool-btn">
+                        <div class="tool-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3>获取当前时间</h3>
+                            <p>显示当前精确时间和日期</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://netdrives.rth1.xyz/tool/generate_uuid.html" target="_blank" class="tool-btn">
+                        <div class="tool-icon">
+                            <i class="fas fa-fingerprint"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3>生成UUID</h3>
+                            <p>生成通用唯一标识符</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://netdrives.rth1.xyz/tool/2FA_key_example.html" target="_blank" class="tool-btn">
+                        <div class="tool-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3>2FA生成器</h3>
+                            <p>双因素认证安全代码生成</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://netdrives.rth1.xyz/tool/date_and_number_generator.html" target="_blank" class="tool-btn">
+                        <div class="tool-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3>日期和编号生成</h3>
+                            <p>批量生成日期和序列号</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
-        <div class="page" id="page2">
-            <a href="jumID/index.html" target="_blank">身份证检验器</a>
-            <a href="tool/generate_QRcode.html" target="_blank">生成二维码</a>
-            <a herf="tool/password_generator.html" target="_blank">密码生成器</a>
-            <a href="tool/English_case_converter.html" target="_blank">英文字符大小写转换工具</a>
+            <div class="page" id="page2">
+                <div class="tool-grid">
+                    <a href="https://netdrives.rth1.xyz/tool/jumID/index.html" target="_blank" class="tool-btn">
+                        <div class="tool-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3>身份证检验器</h3>
+                            <p>验证身份证号码的有效性</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://netdrives.rth1.xyz/tool/generate_QRcode.html" target="_blank" class="tool-btn">
+                        <div class="tool-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3>生成二维码</h3>
+                            <p>将文本或链接转换为二维码</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://netdrives.rth1.xyz/tool/password_generator.html" target="_blank" class="tool-btn">
+                        <div class="tool-icon">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3>密码生成器</h3>
+                            <p>创建高强度安全密码</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://netdrives.rth1.xyz/tool/English_case_converter.html" target="_blank" class="tool-btn">
+                        <div class="tool-icon">
+                            <i class="fas fa-font"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3>英文字符大小写转换</h3>
+                            <p>快速转换英文文本大小写</p>
+                        </div>
+                    </a>
+                    
+                    <a href="https://netdrives.rth1.xyz/tool/scientific_calculator.html" target="_blank" class="tool-btn">
+                        <div class="tool-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <div class="tool-info">
+                            <h3>科学计算器</h3>
+                            <p>高级数学计算工具</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
-
+        
         <div class="pagination">
-            <button onclick="prevPage()" id="prev-btn">上一页</button>
+            <button class="page-btn" onclick="prevPage()" id="prev-btn">
+                <i class="fas fa-chevron-left"></i>
+                上一页
+            </button>
             <span class="page-number" id="page-number">1 / 2</span>
-            <button onclick="nextPage()" id="next-btn">下一页</button>
+            <button class="page-btn" onclick="nextPage()" id="next-btn">
+                下一页
+                <i class="fas fa-chevron-right"></i>
+            </button>
         </div>
-
-        <button onclick="toggleDarkMode()">切换暗色模式</button>
     </div>
 
     <script>
         // 暗色模式切换
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
+            
+            // 更新按钮文本
+            const btn = document.querySelector('.mode-toggle');
+            const icon = btn.querySelector('i');
+            if (document.body.classList.contains('dark-mode')) {
+                btn.innerHTML = '<i class="fas fa-sun"></i> 亮色模式';
+            } else {
+                btn.innerHTML = '<i class="fas fa-moon"></i> 暗色模式';
+            }
         }
 
         // 分页功能
@@ -197,13 +559,38 @@
 
         // 公告栏自动隐藏
         function hideAnnouncement() {
-            document.getElementById('announcement').style.display = 'none';
+            const announcement = document.getElementById('announcement');
+            announcement.style.opacity = '1';
+            
+            // 淡出动画
+            let opacity = 1;
+            const fadeOut = setInterval(() => {
+                opacity -= 0.05;
+                announcement.style.opacity = opacity;
+                
+                if (opacity <= 0) {
+                    clearInterval(fadeOut);
+                    announcement.style.display = 'none';
+                }
+            }, 50);
         }
 
         // 初始化
         window.onload = function() {
             showPage(currentPage); // 初始化分页
             setTimeout(hideAnnouncement, 5000); // 5秒后自动隐藏公告栏
+            
+            // 添加工具按钮悬停效果
+            const toolBtns = document.querySelectorAll('.tool-btn');
+            toolBtns.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
         };
     </script>
 </body>
