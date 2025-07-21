@@ -1,209 +1,591 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>英文字符大小写转换工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', '微软雅黑', sans-serif;
-            background: linear-gradient(to bottom, #e6e9f0, #ffffff);
-            margin: 0;
+            background: linear-gradient(to bottom, #f5f7fa, #e4e7eb);
+            color: #333;
+            min-height: 100vh;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            transition: background 0.5s ease;
         }
 
-        .converter {
-            width: 90%;
-            max-width: 700px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            color: #333;
+        body.dark-mode {
+            background: linear-gradient(to bottom, #2c3e50, #1a2530);
         }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        textarea#input-text {
+        .converter-container {
             width: 100%;
-            height: 160px;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            resize: vertical;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            max-width: 900px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            transition: all 0.4s ease;
         }
 
-        textarea#input-text:focus {
-            box-shadow: 0 0 8px rgba(33, 150, 249, 0.3);
+        body.dark-mode .converter-container {
+            background: #2a2a2a;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
         }
 
-        .button-row {
+        .converter-header {
+            background: #f8f9ff;
+            color: #2c3e50;
+            padding: 25px 40px;
+            position: relative;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            border-bottom: 1px solid #eaeaea;
+            transition: all 0.4s ease;
+        }
+
+        body.dark-mode .converter-header {
+            background: #333;
+            border-color: #444;
+            color: #f0f0f0;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .tool-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: rgba(75, 108, 183, 0.1);
+            border-radius: 16px;
+            transition: all 0.4s ease;
+        }
+
+        body.dark-mode .tool-icon {
+            background: rgba(75, 108, 183, 0.2);
+        }
+
+        .tool-icon i {
+            font-size: 28px;
+            color: #4b6cb7;
+            transition: all 0.4s ease;
+        }
+
+        body.dark-mode .tool-icon i {
+            color: #5a9cff;
+        }
+
+        .header-text h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+            transition: color 0.4s ease;
+        }
+
+        body.dark-mode .header-text h1 {
+            color: #f0f0f0;
+        }
+
+        .header-text p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            transition: color 0.4s ease;
+        }
+
+        body.dark-mode .header-text p {
+            color: #ccc;
+        }
+
+        /* 暗色模式切换按钮 */
+        .dark-mode-toggle {
+            background: #f0f4ff;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .dark-mode-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        .dark-mode-toggle i {
+            font-size: 22px;
+            color: #4b6cb7;
+            transition: all 0.4s ease;
+        }
+
+        body.dark-mode .dark-mode-toggle {
+            background: #444;
+        }
+
+        body.dark-mode .dark-mode-toggle i {
+            color: #f0f0f0;
+        }
+
+        .converter-body {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .converter-body {
+                grid-template-columns: 1fr;
+                padding: 25px;
+            }
+        }
+
+        .text-area-container {
+            position: relative;
+        }
+
+        .text-area-container label {
+            display: block;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: color 0.4s ease;
+        }
+
+        body.dark-mode .text-area-container label {
+            color: #ddd;
+        }
+
+        textarea {
+            width: 100%;
+            height: 220px;
+            padding: 20px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+            color: #2c3e50;
+            box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.03);
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        body.dark-mode textarea {
+            background: #333;
+            border-color: #444;
+            color: #f0f0f0;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4b6cb7;
+            box-shadow: 0 0 0 4px rgba(75, 108, 183, 0.2);
+        }
+
+        .controls-section {
+            padding: 25px;
+            background: #f8f9ff;
+            border-radius: 16px;
             margin-top: 20px;
+            transition: all 0.4s ease;
+        }
+
+        body.dark-mode .controls-section {
+            background: #333;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .action-buttons {
             display: flex;
-            gap: 10px;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .action-button {
-            padding: 12px 20px;
+            padding: 14px 28px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 600;
             border: none;
-            border-radius: 6px;
+            border-radius: 12px;
             color: white;
             cursor: pointer;
-            transition: background 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.18);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
         }
 
         .convert-button {
-            background-color: #2196F3;
-        }
-
-        .convert-button:hover {
-            background-color: #1976D2;
+            background: linear-gradient(135deg, #4b6cb7, #3a56a0);
         }
 
         .copy-button {
-            background-color: #4CAF50;
-        }
-
-        .copy-button:hover {
-            background-color: #388E3C;
+            background: linear-gradient(135deg, #00b09b, #009e8c);
         }
 
         .clear-button {
-            background-color: #D32F2F;
-        }
-
-        .clear-button:hover {
-            background-color: #B71C1C;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
         }
 
         .option-box {
-            padding: 10px 16px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 14px;
-            min-width: 160px;
-            background-color: #f9f9f9;
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+            position: relative;
+        }
+
+        .option-box::before {
+            content: "\f0de";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #4b6cb7;
+            z-index: 1;
+            transition: color 0.4s ease;
+        }
+
+        body.dark-mode .option-box::before {
+            color: #5a9cff;
+        }
+
+        select {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            color: #2c3e50;
+            appearance: none;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode select {
+            background: #3a3a3a;
+            border-color: #444;
+            color: #f0f0f0;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #4b6cb7;
+            box-shadow: 0 0 0 4px rgba(75, 108, 183, 0.2);
         }
 
         .status-bar {
             width: 100%;
-            height: 40px;
-            border: 2px solid #ccc;
-            border-radius: 8px;
+            height: 60px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            color: #555;
-            background-color: #f5f5f5;
-            margin-top: 15px;
-            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 500;
+            background: #f8f9ff;
+            margin-top: 25px;
+            transition: all 0.4s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            position: relative;
+        }
+
+        body.dark-mode .status-bar {
+            background: #333;
+        }
+
+        .status-bar::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 4px;
+            background: #4b6cb7;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.6s ease;
         }
 
         .status-bar.success {
-            border-color: #4CAF50;
-            background-color: #e8f5e9;
+            background: #e8f5e9;
             color: #388e3c;
         }
 
+        .status-bar.success::before {
+            background: #4CAF50;
+            transform: scaleX(1);
+        }
+
+        body.dark-mode .status-bar.success {
+            background: #1c3a1c;
+        }
+
         .status-bar.error {
-            border-color: #D32F2F;
-            background-color: #ffcdd2;
+            background: #ffebee;
             color: #c62828;
         }
 
-        .status-bar.info {
-            border-color: #9E9E9E;
-            background-color: #eeeeee;
-            color: #757575;
+        .status-bar.error::before {
+            background: #f44336;
+            transform: scaleX(1);
         }
 
-        textarea#output-text {
-            width: 100%;
-            height: 160px;
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            resize: vertical;
-            margin-top: 15px;
-            background-color: #fafafa;
+        body.dark-mode .status-bar.error {
+            background: #3a1c1c;
+        }
+
+        .status-bar.info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-bar.info::before {
+            background: #2196F3;
+            transform: scaleX(1);
+        }
+
+        body.dark-mode .status-bar.info {
+            background: #1c2c3a;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f5f7fa, #e4e7eb);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 30px;
+            transition: all 0.4s ease;
+        }
+
+        body.dark-mode .info-card {
+            background: linear-gradient(135deg, #333, #3a3a3a);
+        }
+
+        .info-card h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            transition: color 0.4s ease;
+        }
+
+        body.dark-mode .info-card h3 {
+            color: #f0f0f0;
+        }
+
+        .info-card ul {
+            padding-left: 25px;
+        }
+
+        .info-card li {
+            margin: 15px 0;
+            color: #444;
+            line-height: 1.6;
+            transition: color 0.4s ease;
+        }
+
+        body.dark-mode .info-card li {
+            color: #ccc;
+        }
+
+        .info-card li strong {
+            color: #4b6cb7;
+            transition: color 0.4s ease;
+        }
+
+        body.dark-mode .info-card li strong {
+            color: #5a9cff;
+        }
+
+        .converter-footer {
+            padding: 20px 40px;
+            text-align: center;
+            background: #f8f9ff;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            transition: all 0.4s ease;
+        }
+
+        body.dark-mode .converter-footer {
+            background: #333;
+            border-color: #444;
+            color: #888;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .converter-container {
+            animation: fadeIn 0.6s ease-out;
         }
     </style>
 </head>
 <body>
-    <div class="converter">
-        <h2>英文字符大小写转换工具</h2>
-        <textarea id="input-text" placeholder="请输入英文文本..."></textarea>
-
-        <!-- 操作按钮行 -->
-        <div class="button-row">
-            <div class="action-buttons">
-                <button class="action-button convert-button" onclick="convert()">转换</button>
-                <button class="action-button copy-button" onclick="copyText()">复制</button>
-                <button class="action-button clear-button" onclick="clearText()">清除</button>
+    <div class="converter-container">
+        <div class="converter-header">
+            <div class="header-content">
+                <div class="tool-icon">
+                    <i class="fas fa-font"></i>
+                </div>
+                <div class="header-text">
+                    <h1>英文字符大小写转换工具</h1>
+                    <p>强大的文本转换工具，支持多种大小写格式和命名规范转换</p>
+                </div>
             </div>
-            <div class="option-box">
-                <select id="conversion-type">
-                    <option value="uppercase">全大写</option>
-                    <option value="lowercase">全小写</option>
-                    <option value="toggleCase">反转大小写</option>
-                    <option value="capitalizeWords">单词首字母大写</option>
-                    <option value="capitalizeSentences">句首首字母大写</option>
-                    <option value="spaceToUnderscore">空格转下划线</option>
-                    <option value="underscoreToSpace">下划线转空格</option>
-                    <option value="camelToUnderscore">驼峰转下划线</option>
-                    <option value="underscoreToCamel">下划线转驼峰</option>
-                    <option value="underscoreToHyphen">下划线转中划线</option>
-                    <option value="hyphenToUnderscore">中划线转下划线</option>
-                    <option value="underscoreToDot">下划线转小数点</option>
-                    <option value="dotToUnderscore">小数点转下划线</option>
-                    <option value="underscoreToComma">下划线转逗号</option>
-                    <option value="commaToUnderscore">逗号转下划线</option>
-                    <option value="lineFirstLower">每行首字母小写</option>
-                    <option value="lineFirstUpper">每行首字母大写</option>
-                    <option value="fullwidthToHalfwidth">全角转半角</option>
-                </select>
+            
+            <button class="dark-mode-toggle" id="dark-mode-toggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+        
+        <div class="converter-body">
+            <div class="text-area-container">
+                <label for="input-text"><i class="fas fa-keyboard"></i> 输入文本</label>
+                <textarea id="input-text" placeholder="请输入要转换的英文文本...">Hello world! This is a sample text for conversion.
+You can try different conversion options.
+variable_name_example
+camelCaseExample
+UPPER CASE EXAMPLE</textarea>
+                
+                <div class="controls-section">
+                    <div class="controls-row">
+                        <div class="action-buttons">
+                            <button class="action-button convert-button" onclick="convert()">
+                                <i class="fas fa-sync-alt"></i> 转换
+                            </button>
+                            <button class="action-button clear-button" onclick="clearText()">
+                                <i class="fas fa-trash-alt"></i> 清除
+                            </button>
+                        </div>
+                        
+                        <div class="option-box">
+                            <select id="conversion-type">
+                                <option value="uppercase">全大写</option>
+                                <option value="lowercase">全小写</option>
+                                <option value="toggleCase">反转大小写</option>
+                                <option value="capitalizeWords">单词首字母大写</option>
+                                <option value="capitalizeSentences">句首首字母大写</option>
+                                <option value="spaceToUnderscore">空格转下划线</option>
+                                <option value="underscoreToSpace">下划线转空格</option>
+                                <option value="camelToUnderscore">驼峰转下划线</option>
+                                <option value="underscoreToCamel">下划线转驼峰</option>
+                                <option value="underscoreToHyphen">下划线转中划线</option>
+                                <option value="hyphenToUnderscore">中划线转下划线</option>
+                                <option value="underscoreToDot">下划线转小数点</option>
+                                <option value="dotToUnderscore">小数点转下划线</option>
+                                <option value="underscoreToComma">下划线转逗号</option>
+                                <option value="commaToUnderscore">逗号转下划线</option>
+                                <option value="lineFirstLower">每行首字母小写</option>
+                                <option value="lineFirstUpper">每行首字母大写</option>
+                                <option value="fullwidthToHalfwidth">全角转半角</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="status-bar" id="status-bar">就绪 - 输入文本并选择转换方式</div>
+                </div>
+            </div>
+            
+            <div class="text-area-container">
+                <label for="output-text"><i class="fas fa-clipboard"></i> 转换结果</label>
+                <textarea id="output-text" readonly></textarea>
+                
+                <div class="controls-section">
+                    <button class="action-button copy-button" onclick="copyText()" style="width: 100%; margin-bottom: 25px;">
+                        <i class="fas fa-copy"></i> 复制转换结果
+                    </button>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-lightbulb"></i> 使用提示</h3>
+                        <ul>
+                            <li><strong>命名规范转换：</strong>支持驼峰式、下划线式等命名规范互转</li>
+                            <li><strong>批量处理：</strong>可一次性转换多行文本</li>
+                            <li><strong>编程友好：</strong>特别适合变量名、常量名转换</li>
+                            <li><strong>格式美化：</strong>自动处理句子和单词首字母大写</li>
+                            <li><strong>全角转半角：</strong>将全角英文字符转换为标准半角字符</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- 状态栏 -->
-        <div class="status-bar" id="status-bar">就绪</div>
-
-        <!-- 输出框 -->
-        <textarea id="output-text" readonly></textarea>
+        
+        <div class="converter-footer">
+            <p>本工具在浏览器本地运行，不保存任何数据</p>
+        </div>
     </div>
 
     <script>
+        // 初始化转换
+        document.addEventListener('DOMContentLoaded', function() {
+            convert();
+        });
+        
         function convert() {
             const type = document.getElementById('conversion-type').value;
             const input = document.getElementById('input-text').value;
+            
+            if (!input.trim()) {
+                showStatus('error', '请输入要转换的文本');
+                return;
+            }
+            
             let output = '';
 
             switch (type) {
@@ -278,9 +660,15 @@
 
         function copyText() {
             const output = document.getElementById('output-text');
+            
+            if (!output.value.trim()) {
+                showStatus('error', '没有内容可复制');
+                return;
+            }
+            
             navigator.clipboard.writeText(output.value)
                 .then(() => {
-                    showStatus('info', '已复制');
+                    showStatus('info', '已复制到剪贴板');
                 })
                 .catch(() => {
                     showStatus('error', '复制失败');
@@ -290,18 +678,39 @@
         function clearText() {
             document.getElementById('input-text').value = '';
             document.getElementById('output-text').value = '';
-            showStatus('error', '已清空');
+            showStatus('error', '已清空所有内容');
         }
 
         function showStatus(type, message) {
             const status = document.getElementById('status-bar');
             status.className = 'status-bar ' + type;
             status.textContent = message;
-            setTimeout(() => {
+            
+            // 清除之前的定时器
+            if (status.timeoutId) {
+                clearTimeout(status.timeoutId);
+            }
+            
+            // 设置5秒后恢复默认状态
+            status.timeoutId = setTimeout(() => {
                 status.className = 'status-bar';
-                status.textContent = '就绪';
-            }, 5000); // 状态栏显示5秒
+                status.textContent = '就绪 - 输入文本并选择转换方式';
+            }, 5000);
         }
+        
+        // 暗色模式切换
+        document.getElementById('dark-mode-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const icon = this.querySelector('i');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
     </script>
 </body>
 </html>
