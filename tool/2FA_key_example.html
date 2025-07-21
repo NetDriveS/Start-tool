@@ -2,117 +2,339 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>2FA 密钥生成器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2FA密钥生成器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        /* 全局样式 */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f9;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+        /* 全局样式重置 */
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
-        /* 容器样式 */
+        /* 整体布局 */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            padding: 20px;
+            transition: background 0.5s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+        }
+
+        /* 主容器 - 卡片设计 */
         .container {
-            border-radius: 15px;
-            padding: 30px;
-            background-color: white;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 400px;
             width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: background-color 0.5s, box-shadow 0.5s;
         }
 
-        /* 标题样式 */
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 24px;
-            font-weight: 600;
+        body.dark-mode .container {
+            background-color: #2a2a2a;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 头部区域 */
+        .header {
+            padding: 30px 25px 20px;
+            text-align: center;
+            position: relative;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.5s, border-color 0.5s;
+        }
+
+        body.dark-mode .header {
+            background-color: #2a2a2a;
+            border-color: #3a3a3a;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+            transition: color 0.5s;
+        }
+
+        body.dark-mode .header h1 {
+            color: #f0f0f0;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1rem;
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.5;
+            transition: color 0.5s;
+        }
+
+        body.dark-mode .header p {
+            color: #aaa;
+        }
+
+        /* 模式切换按钮 */
+        .mode-toggle {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: #f0f0f0;
+            border: none;
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-toggle:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .mode-toggle:active {
+            transform: translateY(1px);
+        }
+
+        body.dark-mode .mode-toggle {
+            background: #3a3a3a;
+            color: #f0f0f0;
+        }
+
+        /* 内容区域 */
+        .content {
+            padding: 25px;
+            transition: background-color 0.5s;
+        }
+
+        body.dark-mode .content {
+            background-color: #2a2a2a;
         }
 
         /* 输入框样式 */
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            transition: border-color 0.3s;
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
         }
 
-        input[type="text"]:focus {
-            border-color: #1e90ff;
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #333;
+            transition: color 0.5s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        body.dark-mode .input-group label {
+            color: #ddd;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            background: #f8f8f8;
+            transition: all 0.5s;
+            color: #333;
+        }
+
+        .input-field:focus {
+            border-color: #3683f7;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(54, 131, 247, 0.2);
+        }
+
+        body.dark-mode .input-field {
+            background: #3a3a3a;
+            border-color: #444;
+            color: #f0f0f0;
         }
 
         /* 按钮样式 */
-        button {
-            background-color: #1e90ff;
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            background-color: #3683f7;
             color: white;
             border: none;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 14px 20px;
+            font-size: 1rem;
             cursor: pointer;
-            border-radius: 8px;
-            transition: background-color 0.3s, transform 0.2s;
-            margin: 5px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(54, 131, 247, 0.25);
         }
 
-        button:hover {
-            background-color: #1c86ee;
-            transform: translateY(-2px);
+        .btn:hover {
+            background-color: #2a7de1;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(54, 131, 247, 0.35);
         }
 
-        button:active {
+        .btn:active {
             transform: translateY(0);
         }
 
-        /* 密钥显示区域样式 */
-        .secret-display-container {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #2c3e50;
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        body.dark-mode .btn-secondary {
+            background-color: #3a3a3a;
+            color: #f0f0f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 密钥显示区域 */
+        .secret-container {
+            background: #f8f8f8;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.5s;
+        }
+
+        .secret-container.hidden {
+            display: none;
+        }
+
+        body.dark-mode .secret-container {
+            background: #3a3a3a;
+            border-color: #444;
+        }
+
+        .secret-label {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color 0.5s;
+        }
+
+        body.dark-mode .secret-label {
+            color: #ddd;
         }
 
         .secret-display {
-            border: 2px solid #1e90ff;
-            border-radius: 8px;
-            padding: 12px;
             font-family: 'Courier New', Courier, monospace;
-            display: inline-block;
-            background-color: #f9f9f9;
-            color: #000; /* 密钥字体颜色改为黑色 */
-            font-weight: bold;
-            margin-top: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 15px;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            word-break: break-all;
+            text-align: center;
+            color: #333;
+            transition: all 0.5s;
         }
 
-        /* 二维码容器样式 */
-        #qrcode {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            display: inline-block;
+        body.dark-mode .secret-display {
+            background: #1e1e1e;
+            border-color: #3a3a3a;
+            color: #f0f0f0;
         }
 
-        /* 隐藏元素样式 */
-        .hidden {
+        /* 二维码区域 - 关键修改 */
+        .qrcode-container {
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            transition: all 0.5s;
+            background: #fff; /* 亮色模式默认背景 */
+        }
+
+        body.dark-mode .qrcode-container {
+            background: #2a2a2a; /* 暗色模式背景 */
+            border-color: #444;
+        }
+
+        .qrcode-container.hidden {
             display: none;
+        }
+
+        .qrcode-label {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: color 0.5s;
+        }
+
+        body.dark-mode .qrcode-label {
+            color: #ddd;
+        }
+
+        #qrcode {
+            display: inline-block;
+            padding: 15px;
+            background: #fff;
+            border-radius: 12px;
+            transition: all 0.5s;
+        }
+
+        body.dark-mode #qrcode {
+            background: #fff; /* 二维码背景保持白色 */
         }
 
         /* 提示信息样式 */
         .alert {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.95rem;
             text-align: center;
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
@@ -133,38 +355,134 @@
             border: 1px solid #2ecc71;
             color: #2ecc71;
         }
+
+        body.dark-mode .alert.error {
+            background-color: #3a1c1c;
+            border-color: #e74c3c;
+            color: #ff8a80;
+        }
+
+        body.dark-mode .alert.success {
+            background-color: #1c3a1c;
+            border-color: #2ecc71;
+            color: #a5d6a7;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 520px) {
+            .container {
+                max-width: 95vw;
+            }
+            
+            .header {
+                padding: 25px 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .input-field {
+                padding: 14px 18px;
+            }
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.2.0/sha.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>2FA 密钥生成器</h1>
-        <div>
-            <label for="username">用户名：</label>
-            <input type="text" id="username" placeholder="请输入用户名">
+        <div class="header">
+            <h1>2FA 密钥生成器</h1>
+            <p>为您的账户生成安全的双因素认证密钥</p>
+            
+            <button class="mode-toggle" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i> 暗色模式
+            </button>
         </div>
-        <div class="secret-display-container hidden" id="secret-container">
-            您的2FA密钥是：<br>
-            <span id="secret-display" class="secret-display"></span>
+        
+        <div class="content">
+            <div class="input-group">
+                <label for="username"><i class="fas fa-user"></i> 用户名</label>
+                <input type="text" id="username" class="input-field" placeholder="请输入用户名">
+            </div>
+            
+            <div class="btn-group">
+                <button id="generate-key" class="btn">
+                    <i class="fas fa-key"></i> 生成密钥
+                </button>
+                <button id="copy-key" class="btn btn-secondary">
+                    <i class="fas fa-copy"></i> 复制密钥
+                </button>
+            </div>
+            
+            <div class="secret-container hidden" id="secret-container">
+                <div class="secret-label">
+                    <i class="fas fa-shield-alt"></i> 您的2FA密钥
+                </div>
+                <div id="secret-display" class="secret-display"></div>
+            </div>
+            
+            <div class="qrcode-container hidden" id="qrcode-container">
+                <div class="qrcode-label">
+                    <i class="fas fa-qrcode"></i> 扫描二维码添加
+                </div>
+                <div id="qrcode"></div>
+            </div>
+            
+            <div id="alert-message" class="alert"></div>
         </div>
-        <button id="generate-key">生成2FA密钥</button>
-        <button id="copy-key" class="hidden">复制密钥</button>
-        <div id="qrcode" class="hidden"></div>
-        <div id="alert-message" class="alert"></div>
     </div>
-    
+
     <script>
+        // 暗色模式切换
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            
+            // 更新按钮文本
+            const btn = document.querySelector('.mode-toggle');
+            if (document.body.classList.contains('dark-mode')) {
+                btn.innerHTML = '<i class="fas fa-sun"></i> 亮色模式';
+            } else {
+                btn.innerHTML = '<i class="fas fa-moon"></i> 暗色模式';
+            }
+            
+            // 重新生成二维码（如果已存在）
+            if (!document.getElementById('qrcode-container').classList.contains('hidden')) {
+                const username = document.getElementById('username').value.trim();
+                const secret = document.getElementById('secret-display').textContent;
+                if (username && secret) {
+                    generateQRCode(username, secret);
+                }
+            }
+        }
+
+        // 生成二维码函数（关键修改）
         function generateQRCode(username, secret) {
             const qrcodeContainer = document.getElementById('qrcode');
             qrcodeContainer.innerHTML = "";  // 清空之前的二维码
+            
+            // 根据当前模式设置二维码颜色
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            
             new QRCode(qrcodeContainer, {
                 text: "otpauth://totp/" + username + "?secret=" + secret,
-                width: 128,
-                height: 128
+                width: 180,
+                height: 180,
+                colorDark: isDarkMode ? "#000000" : "#000000", // 保持黑色，但容器背景确保对比度
+                colorLight: "#ffffff", // 使用白色背景确保可读性
+                correctLevel: QRCode.CorrectLevel.H
             });
         }
 
+        // 生成随机密钥
         function generateRandomKey() {
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
             const randomValues = new Uint8Array(32);
@@ -176,12 +494,14 @@
             return result;
         }
 
+        // 切换元素显示状态
         function toggleElements(show) {
             document.getElementById('secret-container').classList.toggle('hidden', !show);
+            document.getElementById('qrcode-container').classList.toggle('hidden', !show);
             document.getElementById('copy-key').classList.toggle('hidden', !show);
-            document.getElementById('qrcode').classList.toggle('hidden', !show);
         }
 
+        // 显示提示信息
         function showAlert(message, isError = true) {
             const alertElement = document.getElementById('alert-message');
             alertElement.textContent = message;
@@ -191,27 +511,38 @@
             }, 3000); // 3秒后自动隐藏
         }
 
-        document.getElementById('generate-key').addEventListener('click', function() {
-            const username = document.getElementById('username').value.trim();
-            if (!username) {
-                showAlert('请输入用户名');
-                return;
+        // 页面加载后初始化
+        window.addEventListener('DOMContentLoaded', function() {
+            // 检查系统是否处于暗色模式
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.mode-toggle').innerHTML = '<i class="fas fa-sun"></i> 亮色模式';
             }
-            const secret = generateRandomKey();  // 生成32位密钥
-            document.getElementById('secret-display').textContent = secret;
-            generateQRCode(username, secret);  // 生成二维码
-            toggleElements(true);
-            document.getElementById('copy-key').focus();
-            showAlert('密钥已生成！', false);
-        });
+            
+            // 生成密钥按钮事件
+            document.getElementById('generate-key').addEventListener('click', function() {
+                const username = document.getElementById('username').value.trim();
+                if (!username) {
+                    showAlert('请输入用户名');
+                    return;
+                }
+                const secret = generateRandomKey();  // 生成32位密钥
+                document.getElementById('secret-display').textContent = secret;
+                generateQRCode(username, secret);  // 生成二维码
+                toggleElements(true);
+                document.getElementById('copy-key').focus();
+                showAlert('密钥已成功生成！', false);
+            });
 
-        document.getElementById('copy-key').addEventListener('click', function() {
-            const secretText = document.getElementById('secret-display').textContent;
-            navigator.clipboard.writeText(secretText).then(function() {
-                showAlert('密钥已复制到剪贴板！', false);
-            }, function(err) {
-                showAlert('复制失败，请手动复制！');
-                console.error('复制失败！', err);
+            // 复制密钥按钮事件
+            document.getElementById('copy-key').addEventListener('click', function() {
+                const secretText = document.getElementById('secret-display').textContent;
+                navigator.clipboard.writeText(secretText).then(function() {
+                    showAlert('密钥已复制到剪贴板！', false);
+                }, function(err) {
+                    showAlert('复制失败，请手动复制！');
+                    console.error('复制失败！', err);
+                });
             });
         });
     </script>
