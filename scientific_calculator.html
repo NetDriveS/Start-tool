@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>科学计算器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 重置默认样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* 整体布局 */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
+            padding: 20px;
+        }
+
+        /* 计算器容器 */
+        .calculator-container {
+            width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        /* 头部区域 - 优化后更紧凑 */
+        .header {
+            padding: 15px 25px 10px; 
+            text-align: center;
+            position: relative;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .header h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #888;
+            font-size: 0.9rem;
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+
+        /* 模式切换按钮 */
+        .mode-toggle {
+            position: absolute;
+            top: 12px;
+            right: 20px;
+            background: #f0f0f0;
+            border: none;
+            color: #333;
+            padding: 6px 12px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .mode-toggle:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .mode-toggle:active {
+            transform: translateY(1px);
+        }
+
+        /* 当前模式指示器 */
+        .current-mode-indicator {
+            position: absolute;
+            top: 12px;
+            left: 25px;
+            background: #f0f0f0;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #666;
+        }
+
+        /* 显示区域 */
+        .display-area {
+            padding: 15px 30px;
+            background: #fff;
+        }
+
+        .display {
+            width: 100%;
+            height: 90px;
+            background: #f5f5f7;
+            color: #333;
+            text-align: right;
+            padding: 15px 20px;
+            font-size: 2.8rem;
+            border-radius: 16px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            font-weight: 300;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            white-space: nowrap;
+        }
+
+        /* 按钮容器 */
+        .buttons-container {
+            padding: 10px 25px 25px;
+            min-height: 400px;
+        }
+
+        /* 科学计算器按钮组 - 5列网格 */
+        .scientific-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            height: 100%;
+        }
+
+        /* 实用计算器按钮组 - 4列网格 */
+        .basic-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            height: 100%;
+        }
+
+        /* 按钮通用样式 */
+        button {
+            padding: 16px 0;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 16px;
+            background: #f8f8f8;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 400;
+            border: 1px solid #e0e0e0;
+        }
+
+        button:active {
+            background: #f0f0f0;
+            transform: scale(0.96);
+        }
+
+        /* 数字按钮 */
+        .number-btn {
+            background: #ffffff;
+            font-weight: 500;
+        }
+
+        /* 操作符按钮 */
+        .operator-btn {
+            background: #f0f0f0;
+            font-weight: 500;
+        }
+
+        /* 函数按钮 */
+        .function-btn {
+            background: #f0f0f0;
+            font-size: 1.1rem;
+            color: #3683f7;
+        }
+
+        /* 等号按钮 */
+        .equal-btn {
+            background: #3683f7;
+            color: white;
+            font-weight: 500;
+            font-size: 1.5rem;
+        }
+
+        /* 清除按钮 */
+        .clear-btn {
+            background: #ff3b30;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        /* 删除按钮 */
+        .delete-btn {
+            background: #a5a5a5;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        /* 历史记录区域 */
+        .history {
+            padding: 15px 25px;
+            color: #888;
+            font-size: 0.9rem;
+            text-align: center;
+            border-top: 1px solid #f0f0f0;
+            min-height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+        }
+
+        /* 响应式设计 - 移动设备适配 */
+        @media (max-width: 520px) {
+            .calculator-container {
+                max-width: 95vw;
+            }
+            
+            .display {
+                height: 80px;
+                font-size: 2.4rem;
+                padding: 12px 15px;
+            }
+            
+            button {
+                padding: 14px 0;
+                font-size: 1.1rem;
+            }
+            
+            .function-btn {
+                font-size: 1.0rem;
+            }
+            
+            .equal-btn {
+                font-size: 1.3rem;
+            }
+            
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .header p {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="header">
+            <!-- 当前模式指示器 -->
+            <div class="current-mode-indicator">
+                <i class="fas fa-calculator"></i>
+                <span id="currentMode">科学计算器</span>
+            </div>
+            
+            <!-- 标题和描述 -->
+            <h1>科学计算器</h1>
+            <p>双模式切换，支持高级数学函数</p>
+            
+            <!-- 模式切换按钮 -->
+            <button class="mode-toggle" onclick="toggleMode()">
+                <i class="fas fa-exchange-alt"></i>
+                切换模式
+            </button>
+        </div>
+        
+        <!-- 显示区域 -->
+        <div class="display-area">
+            <div class="display" id="display">0</div>
+        </div>
+        
+        <!-- 按钮容器 - 动态加载不同模式的按钮 -->
+        <div class="buttons-container" id="buttonContainer"></div>
+        
+        <!-- 历史记录区域 -->
+        <div class="history" id="history">
+            <i class="fas fa-history"></i>
+            <span>开始计算吧...</span>
+        </div>
+    </div>
+
+    <script>
+        // DOM元素引用
+        const display = document.getElementById('display');
+        const currentMode = document.getElementById('currentMode');
+        const buttonContainer = document.getElementById('buttonContainer');
+        const historyDisplay = document.getElementById('history');
+        
+        // 状态变量
+        let isBasicMode = false;
+        let calculationHistory = [];
+        let lastCalculation = '';
+
+        // 科学计算器按钮组 - 5列布局
+        const scientificButtons = `
+            <div class="scientific-buttons">
+                <!-- 第一行：数学常数和函数 -->
+                <button class="function-btn" onclick="appendValue('π')">π</button>
+                <button class="function-btn" onclick="appendValue('e')">e</button>
+                <button class="function-btn" onclick="appendValue('|x|')">|x|</button>
+                <button class="function-btn" onclick="appendValue('1/x')">1/x</button>
+                <button class="function-btn" onclick="appendValue('!')">x!</button>
+
+                <!-- 第二行：对数函数 -->
+                <button class="function-btn" onclick="appendValue('ln')">ln</button>
+                <button class="function-btn" onclick="appendValue('log')">log</button>
+                <button class="function-btn" onclick="appendValue('sin')">sin</button>
+                <button class="function-btn" onclick="appendValue('cos')">cos</button>
+                <button class="function-btn" onclick="appendValue('tan')">tan</button>
+
+                <!-- 第三行：括号和基础运算 -->
+                <button class="function-btn" onclick="appendValue('(')">(</button>
+                <button class="function-btn" onclick="appendValue(')')">)</button>
+                <button class="operator-btn" onclick="appendValue('/')">÷</button>
+                <button class="function-btn" onclick="appendValue('√')">√</button>
+                <button class="clear-btn" onclick="clearDisplay()">C</button>
+
+                <!-- 第四行：数字7-9和运算符 -->
+                <button class="number-btn" onclick="appendValue('7')">7</button>
+                <button class="number-btn" onclick="appendValue('8')">8</button>
+                <button class="number-btn" onclick="appendValue('9')">9</button>
+                <button class="operator-btn" onclick="appendValue('*')">×</button>
+                <button class="operator-btn" onclick="appendValue('^')">^</button>
+
+                <!-- 第五行：数字4-6和运算符 -->
+                <button class="number-btn" onclick="appendValue('4')">4</button>
+                <button class="number-btn" onclick="appendValue('5')">5</button>
+                <button class="number-btn" onclick="appendValue('6')">6</button>
+                <button class="operator-btn" onclick="appendValue('-')">−</button>
+                <button class="function-btn" onclick="appendValue('asin')">sin⁻¹</button>
+
+                <!-- 第六行：数字1-3和运算符 -->
+                <button class="number-btn" onclick="appendValue('1')">1</button>
+                <button class="number-btn" onclick="appendValue('2')">2</button>
+                <button class="number-btn" onclick="appendValue('3')">3</button>
+                <button class="operator-btn" onclick="appendValue('+')">+</button>
+                <button class="function-btn" onclick="appendValue('acos')">cos⁻¹</button>
+
+                <!-- 第七行（最后一行）：数字0、小数点、等号、删除和反三角函数 -->
+                <button class="number-btn" onclick="appendValue('0')">0</button>
+                <button class="number-btn" onclick="appendValue('.')">.</button>
+                <button class="equal-btn" onclick="calculate()">=</button>
+                <button class="delete-btn" onclick="backspace()"><i class="fas fa-delete-left"></i></button>
+                <button class="function-btn" onclick="appendValue('atan')">tan⁻¹</button>
+            </div>
+        `;
+
+        // 实用计算器按钮组 - 4列布局
+        const basicButtons = `
+            <div class="basic-buttons">
+                <!-- 第一行：清除和删除功能 -->
+                <button class="clear-btn" onclick="clearDisplay()">C</button>
+                <button class="delete-btn" onclick="backspace()"><i class="fas fa-delete-left"></i></button>
+                <button class="operator-btn" onclick="appendValue('^')">^</button>
+                <button class="operator-btn" onclick="appendValue('/')">÷</button>
+
+                <!-- 第二行：数字7-9和乘号 -->
+                <button class="number-btn" onclick="appendValue('7')">7</button>
+                <button class="number-btn" onclick="appendValue('8')">8</button>
+                <button class="number-btn" onclick="appendValue('9')">9</button>
+                <button class="operator-btn" onclick="appendValue('*')">×</button>
+
+                <!-- 第三行：数字4-6和减号 -->
+                <button class="number-btn" onclick="appendValue('4')">4</button>
+                <button class="number-btn" onclick="appendValue('5')">5</button>
+                <button class="number-btn" onclick="appendValue('6')">6</button>
+                <button class="operator-btn" onclick="appendValue('-')">−</button>
+
+                <!-- 第四行：数字1-3和加号 -->
+                <button class="number-btn" onclick="appendValue('3')">3</button>
+                <button class="number-btn" onclick="appendValue('2')">2</button>
+                <button class="number-btn" onclick="appendValue('1')">1</button>
+                <button class="operator-btn" onclick="appendValue('+')">+</button>
+
+                <!-- 第五行：数字0、小数点和等号 -->
+                <button class="number-btn" onclick="appendValue('0')">0</button>
+                <button class="number-btn" onclick="appendValue('.')">.</button>
+                <button class="equal-btn" style="grid-column: span 2;" onclick="calculate()">=</button>
+            </div>
+        `;
+
+        // 初始化计算器
+        function initCalculator() {
+            isBasicMode = false;
+            currentMode.textContent = '科学计算器';
+            buttonContainer.innerHTML = scientificButtons;
+        }
+
+        // 切换计算器模式
+        function toggleMode() {
+            isBasicMode = !isBasicMode;
+            currentMode.textContent = isBasicMode ? '实用计算器' : '科学计算器';
+            buttonContainer.innerHTML = isBasicMode ? basicButtons : scientificButtons;
+            
+            // 添加切换动画效果
+            buttonContainer.animate([
+                { opacity: 0, transform: 'translateY(10px)' },
+                { opacity: 1, transform: 'translateY(0)' }
+            ], {
+                duration: 300,
+                easing: 'ease-out'
+            });
+        }
+
+        // 退格功能
+        function backspace() {
+            if (display.textContent === '0' || display.textContent.length === 1) {
+                display.textContent = '0';
+            } else {
+                display.textContent = display.textContent.slice(0, -1);
+            }
+        }
+
+        // 向显示区域追加值
+        function appendValue(value) {
+            const current = display.textContent;
+            
+            // 如果当前显示错误信息，清除它
+            if (['除以零错误', '无效输入', '负数无阶乘', '计算错误'].includes(current)) {
+                display.textContent = '0';
+            }
+
+            // 防止连续运算符
+            if (['+', '-', '*', '/', '^'].includes(value)) {
+                const lastChar = current.slice(-1);
+                if (['+', '-', '*', '/', '^'].includes(lastChar)) return;
+            }
+
+            if (current === '0' && value !== '(' && value !== ')') {
+                display.textContent = value;
+            } else {
+                display.textContent += value;
+            }
+        }
+
+        // 清除显示区域
+        function clearDisplay() {
+            display.textContent = '0';
+            historyDisplay.innerHTML = '<i class="fas fa-history"></i> 已清除';
+            setTimeout(() => {
+                if (historyDisplay.textContent.includes("已清除")) {
+                    historyDisplay.innerHTML = lastCalculation 
+                        ? `<i class="fas fa-history"></i> 上次计算: ${lastCalculation}` 
+                        : '<i class="fas fa-history"></i> 开始计算吧...';
+                }
+            }, 1500);
+        }
+
+        // 手动实现阶乘计算
+        function factorial(n) {
+            if (n < 0) throw new Error("负数无阶乘");
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) result *= i;
+            return result;
+        }
+
+        // 执行计算
+        function calculate() {
+            let expr = display.textContent.trim();
+            
+            // 如果表达式为空
+            if (!expr || expr === '0') return;
+            
+            try {
+                // 替换符号为JavaScript表达式
+                expr = expr
+                    .replace(/√/g, 'Math.sqrt')
+                    .replace(/π/g, 'Math.PI')
+                    .replace(/e/g, 'Math.E')
+                    .replace(/\^/g, '**')
+                    .replace(/÷/g, '/')
+                    .replace(/×/g, '*')
+                    .replace(/\|x\|/g, 'Math.abs')
+                    .replace(/1\/x/g, '1/')
+                    .replace(/ln/g, 'Math.log')
+                    .replace(/log/g, 'Math.log10')
+                    .replace(/asin/g, 'Math.asin')
+                    .replace(/acos/g, 'Math.acos')
+                    .replace(/atan/g, 'Math.atan')
+                    .replace(/sin/g, 'Math.sin')
+                    .replace(/cos/g, 'Math.cos')
+                    .replace(/tan/g, 'Math.tan');
+
+                // 处理阶乘（数字后接!）
+                expr = expr.replace(/(\d+)!/g, (match, num) => `factorial(${num})`);
+                
+                // 处理绝对值（|x|格式）
+                expr = expr.replace(/\|([^|]+)\|/g, 'Math.abs($1)');
+                
+                // 安全计算表达式
+                const result = new Function('factorial', `return ${expr}`)(factorial);
+                
+                // 保存历史
+                lastCalculation = `${display.textContent} = ${result}`;
+                calculationHistory.push(lastCalculation);
+                if (calculationHistory.length > 3) calculationHistory.shift();
+                historyDisplay.innerHTML = `<i class="fas fa-history"></i> 上次计算: ${lastCalculation}`;
+                
+                // 显示结果（最多15个字符）
+                display.textContent = result.toString().slice(0, 15);
+            } catch (error) {
+                console.error(error);
+                if (error.message.includes("Division by zero")) {
+                    display.textContent = "除以零错误";
+                } else if (error.message.includes("负数无阶乘")) {
+                    display.textContent = "负数无阶乘";
+                } else {
+                    display.textContent = "计算错误";
+                }
+                
+                // 3秒后清除错误
+                setTimeout(() => {
+                    if (['除以零错误', '无效输入', '负数无阶乘', '计算错误'].includes(display.textContent)) {
+                        display.textContent = '0';
+                    }
+                }, 2500);
+            }
+        }
+
+        // 初始化计算器
+        initCalculator();
+    </script>
+</body>
+</html>
