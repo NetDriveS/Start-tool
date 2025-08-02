@@ -23,26 +23,43 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
             padding: 20px;
             transition: background 0.3s ease;
+            flex-direction: column;
         }
 
         body.dark-mode {
             background: linear-gradient(135deg, #1e1e1e 0%, #2c2c2c 100%);
         }
 
-        /* 公告栏样式 */
+        /* 公告栏样式 - 优化 */
+        .announcement-container {
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+            transition: all 0.5s ease;
+            max-height: 80px;
+            overflow: hidden;
+        }
+        
         .announcement {
             background: linear-gradient(to right, #3683f7, #5a9cff);
             color: #ffffff;
             padding: 15px 25px;
             text-align: center;
-            margin-bottom: 20px;
             border-radius: 16px;
             box-shadow: 0 4px 12px rgba(54, 131, 247, 0.25);
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
             animation: fadeIn 0.5s ease;
+        }
+
+        .announcement.hide {
+            opacity: 0;
+            transform: translateY(-20px);
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin-bottom: 0;
         }
 
         .announcement i {
@@ -53,6 +70,22 @@
         .announcement p {
             font-size: 1rem;
             font-weight: 500;
+            flex: 1;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-left: 15px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
         }
 
         body.dark-mode .announcement {
@@ -191,7 +224,7 @@
         }
 
         a.tool-btn:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
             background: #3683f7;
             color: white;
@@ -200,6 +233,10 @@
 
         a.tool-btn:hover .tool-icon {
             background: rgba(255, 255, 255, 0.2);
+        }
+
+        a.tool-btn:hover .tool-icon i {
+            color: white;
         }
 
         .tool-icon {
@@ -217,6 +254,7 @@
         .tool-icon i {
             color: #3683f7;
             font-size: 1.2rem;
+            transition: color 0.3s;
         }
 
         .tool-info {
@@ -289,14 +327,14 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
-        .page-btn:hover {
+        .page-btn:hover:not(:disabled) {
             background: #e0e0e0;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         .page-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
@@ -313,6 +351,8 @@
             font-weight: 500;
             color: #666;
             transition: color 0.3s;
+            min-width: 60px;
+            text-align: center;
         }
 
         body.dark-mode .page-number {
@@ -342,6 +382,10 @@
                 max-width: 95vw;
             }
             
+            .announcement-container {
+                max-width: 95vw;
+            }
+            
             .header h1 {
                 font-size: 1.5rem;
             }
@@ -368,14 +412,28 @@
                 padding: 8px 16px;
                 font-size: 0.9rem;
             }
+            
+            .header {
+                padding-top: 50px;
+            }
+            
+            .mode-toggle {
+                top: 15px;
+                right: 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 公告栏 -->
-    <div class="announcement" id="announcement">
-        <i class="fas fa-bullhorn"></i>
-        <p>欢迎访问小工具导航页！所有工具完全免费，无广告，数据均在本地处理</p>
+    <!-- 公告栏容器 -->
+    <div class="announcement-container" id="announcement-container">
+        <div class="announcement" id="announcement">
+            <i class="fas fa-bullhorn"></i>
+            <p>欢迎访问小工具导航页！所有工具完全免费，无广告，数据均在本地处理</p>
+            <button class="close-btn" onclick="hideAnnouncement()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
     </div>
 
     <div class="container">
@@ -383,9 +441,9 @@
             <h1>小工具导航页</h1>
             <h4>这些工具完全免费，无广告，数据均在本地完成哦！欢迎使用！</h4>
             
-            <button class="mode-toggle" onclick="toggleDarkMode()">
+            <button class="mode-toggle" id="mode-toggle" onclick="toggleDarkMode()">
                 <i class="fas fa-moon"></i>
-                暗色模式
+                <span>暗色模式</span>
             </button>
         </div>
         
@@ -500,7 +558,7 @@
         </div>
         
         <div class="pagination">
-            <button class="page-btn" onclick="prevPage()" id="prev-btn">
+            <button class="page-btn" onclick="prevPage()" id="prev-btn" disabled>
                 <i class="fas fa-chevron-left"></i>
                 上一页
             </button>
@@ -513,18 +571,26 @@
     </div>
 
     <script>
-        // 暗色模式切换
+        // 暗色模式切换 - 优化
         function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
+            const body = document.body;
+            body.classList.toggle('dark-mode');
             
             // 更新按钮文本
-            const btn = document.querySelector('.mode-toggle');
+            const btn = document.getElementById('mode-toggle');
             const icon = btn.querySelector('i');
-            if (document.body.classList.contains('dark-mode')) {
-                btn.innerHTML = '<i class="fas fa-sun"></i> 亮色模式';
+            const text = btn.querySelector('span');
+            
+            if (body.classList.contains('dark-mode')) {
+                icon.className = 'fas fa-sun';
+                text.textContent = '亮色模式';
             } else {
-                btn.innerHTML = '<i class="fas fa-moon"></i> 暗色模式';
+                icon.className = 'fas fa-moon';
+                text.textContent = '暗色模式';
             }
+            
+            // 保存用户偏好
+            localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
         }
 
         // 分页功能
@@ -557,40 +623,39 @@
             }
         }
 
-        // 公告栏自动隐藏
+        // 公告栏隐藏功能 - 优化
         function hideAnnouncement() {
             const announcement = document.getElementById('announcement');
-            announcement.style.opacity = '1';
+            const container = document.getElementById('announcement-container');
             
-            // 淡出动画
-            let opacity = 1;
-            const fadeOut = setInterval(() => {
-                opacity -= 0.05;
-                announcement.style.opacity = opacity;
-                
-                if (opacity <= 0) {
-                    clearInterval(fadeOut);
-                    announcement.style.display = 'none';
-                }
-            }, 50);
+            // 添加隐藏类以触发动画
+            announcement.classList.add('hide');
+            
+            // 动画结束后移除元素
+            setTimeout(() => {
+                container.style.display = 'none';
+            }, 500);
         }
 
         // 初始化
         window.onload = function() {
             showPage(currentPage); // 初始化分页
-            setTimeout(hideAnnouncement, 5000); // 5秒后自动隐藏公告栏
             
-            // 添加工具按钮悬停效果
-            const toolBtns = document.querySelectorAll('.tool-btn');
-            toolBtns.forEach(btn => {
-                btn.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                });
-                
-                btn.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
+            // 检查暗色模式偏好
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                const btn = document.getElementById('mode-toggle');
+                const icon = btn.querySelector('i');
+                const text = btn.querySelector('span');
+                icon.className = 'fas fa-sun';
+                text.textContent = '亮色模式';
+            }
+            
+            // 添加工具按钮悬停效果 - 移除JS实现，改用CSS
+            // 不再需要JS监听器，CSS已实现更好的效果
+            
+            // 5秒后自动隐藏公告栏
+            setTimeout(hideAnnouncement, 5000);
         };
     </script>
 </body>
