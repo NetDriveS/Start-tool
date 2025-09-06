@@ -64,7 +64,7 @@ cd Start-tool
 
 ## 📜 许可证  
 
-本项目采用 [MIT License](https://github.com/Anzeacc10/Start-tool/blob/main/LICENSE) 开源协议，欢迎自由使用、修改与分发。  
+本项目采用 [MIT License](https://github.com/NetDriveS/Start-tool/blob/main/LICENSE) 开源协议，欢迎自由使用、修改与分发。  
 
 ---
 
