@@ -24,7 +24,7 @@
 
 ### 1. 克隆项目  
 ```bash
-git clone https://github.com/NetDriveS/Start-tool.git
+git clone https://github.com/NetDriveS/Start-tool.zip
 cd Start-tool
 ```
 
