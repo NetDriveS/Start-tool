@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日期和编号生成器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+:root {
+    --color-primary: #3683f7;
+    --color-primary-light: #5a9cff;
+    --color-primary-dark: #005bb5;
+    --color-primary-rgb: 54, 131, 247;
+    --color-primary-light-rgb: 90, 156, 255;
+    --color-primary-dark-rgb: 0, 91, 181;
+    --color-success-rgb: 76, 175, 80;
+    --color-error-rgb: 244, 67, 54;
+    --color-secondary: #825ee4;
+    --color-accent: #11cdef;
+    --color-text-primary: #333;
+    --color-text-secondary: #666;
+    --color-text-muted: #999;
+    --color-text-inverse: #f0f0f0;
+    --color-text-muted-888: #888;
+    --color-text-inverse-aaa: #aaa;
+    --color-primary-lighter: #8fc1ff;
+    --color-bg-main: #f5f7fa;
+    --color-bg-alt: #f8f9fa;
+    --color-bg-dark-card: #2a2a2a;
+    --color-bg-gradient-start: #f5f7fa;
+    --color-bg-gradient-end: #e4e7eb;
+    --color-bg-card: #ffffff;
+    --color-bg-input: #f8f8f8;
+    --color-border: #e0e0e0;
+    --color-border-light: #f0f0f0;
+    --color-border-eee: #eee;
+    --color-border-444: #444;
+    --color-success: #4caf50;
+    --color-success-alt: #2ecc71;
+    --color-success-alt-rgb: 46, 204, 113;
+    --color-success-bg: #e8f5e9;
+    --color-error: #f44336;
+    --color-error-bg: #ffebee;
+    --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.08);
+    --shadow-primary: 0 4px 15px rgba(54, 131, 247, 0.3);
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --radius-full: 30px;
+    --transition-fast: all 0.2s ease;
+    --transition-normal: all 0.3s ease;
+    --transition-slow: all 0.5s ease;
+    --gradient-primary: linear-gradient(135deg, #3683f7, #5a9cff);
+    --gradient-success: linear-gradient(135deg, #2ecc71, #27ae60);
+    --gradient-success-alt: linear-gradient(135deg, #11998e, #38ef7d);
+    --gradient-error: linear-gradient(135deg, #ff6b6b, #ff5252);
+}
+
+
+
+/* ============================================
+   日期编号生成器 - 现代化UI样式 (date-number-generator.html)
+   与 index_tool.html 保持一致的现代化UI风格
+   ============================================ */
+
+/* 页面布局居中 */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--color-bg-gradient-start) 0%, var(--color-bg-gradient-end) 100%);
+    padding: 20px;
+    transition: var(--transition-slow);
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* 工具容器 - 与 index_tool.html 容器一致 */
+.tool-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    animation: slideUp 0.5s ease;
+}
+
+body.dark-mode {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+body.dark-mode .tool-container {
+    background-color: var(--color-bg-dark-card);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+}
+
+/* 工具头部区域 */
+.tool-header {
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    background: var(--gradient-primary);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.tool-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.tool-header .tool-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 18px;
+    flex-shrink: 0;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.tool-header .tool-icon i {
+    font-size: 1.8rem;
+    color: white;
+}
+
+.tool-header .tool-info {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.tool-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+}
+
+.tool-header p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* 工具内容区域 */
+.tool-content {
+    padding: 25px;
+    background: var(--color-bg-card);
+}
+
+/* 计数器显示 */
+.counter-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 15px 20px;
+    background: var(--color-bg-alt);
+    border-radius: 14px;
+    margin-bottom: 20px;
+    border: 1px solid var(--color-border-eee);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .counter-display {
+    background: var(--color-bg-dark-card);
+    border-color: var(--color-border-444);
+}
+
+.counter-label {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+body.dark-mode .counter-label {
+    color: var(--color-text-inverse-aaa);
+}
+
+.counter-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    min-width: 60px;
+    text-align: center;
+}
+
+body.dark-mode .counter-value {
+    background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary-lighter) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* 结果显示区域 */
+.display-result {
+    background: var(--color-bg-card);
+    border-radius: 16px;
+    padding: 25px 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--color-border-eee);
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    clear: both;
+    overflow: hidden;
+}
+
+body.dark-mode .display-result {
+    background: var(--color-bg-dark-card);
+    border-color: var(--color-border-444);
+}
+
+.display-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted-888);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.display-label i {
+    color: var(--color-primary);
+    font-size: 1rem;
+}
+
+#display {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 3px;
+    padding: 15px;
+    background: rgba(var(--color-primary-rgb), 0.08);
+    border-radius: 12px;
+    border: 2px solid rgba(var(--color-primary-rgb), 0.2);
+    transition: all 0.3s ease;
+}
+
+body.dark-mode #display {
+    color: var(--color-text-inverse);
+    background: rgba(var(--color-primary-rgb), 0.15);
+    border-color: rgba(var(--color-primary-light-rgb), 0.3);
+}
+
+#display.pulse-animation {
+    animation: pulse 0.5s ease;
+}
+
+#display.copy-animation {
+    animation: copyFlash 0.5s ease;
+}
+
+/* 工具按钮组 */
+.tool-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.tool-btn {
+    padding: 14px 16px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.tool-btn i {
+    font-size: 1rem;
+}
+
+/* 按钮变体 - 全部使用主题色 */
+.tool-btn.btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.tool-btn.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(var(--color-primary-rgb), 0.35);
+}
+
+.tool-btn.btn-primary:active {
+    transform: translateY(1px);
+}
+
+/* 格式说明信息 */
+.format-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 18px;
+    background: rgba(var(--color-primary-rgb), 0.08);
+    border-radius: 14px;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    border-left: 4px solid var(--color-primary);
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    clear: both;
+}
+
+.format-info i {
+    color: var(--color-primary);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--color-primary-rgb), 0.12);
+    border-radius: 50%;
+    margin-top: -2px;
+}
+
+body.dark-mode .format-info {
+    background: rgba(var(--color-primary-rgb), 0.12);
+    color: var(--color-text-inverse-aaa);
+    border-left-color: var(--color-primary-light);
+}
+
+body.dark-mode .format-info i {
+    background: rgba(var(--color-primary-light-rgb), 0.15);
+    color: var(--color-primary-lighter);
+}
+
+.format-info strong {
+    color: var(--color-primary);
+}
+
+body.dark-mode .format-info strong {
+    color: var(--color-primary-lighter);
+}
+
+/* 提示信息弹窗 */
+.alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.alert.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.alert.error {
+    background: var(--gradient-error);
+    color: white;
+}
+
+.alert.success {
+    background: var(--gradient-success-alt);
+    color: white;
+}
+
+/* 动画关键帧 */
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+}
+
+@keyframes copyFlash {
+    0%, 100% { 
+        background: rgba(var(--color-primary-rgb), 0.08);
+        border-color: rgba(var(--color-primary-rgb), 0.2);
+    }
+    50% { 
+        background: rgba(var(--color-success-alt-rgb), 0.25);
+        border-color: rgba(var(--color-success-alt-rgb), 0.5);
+    }
+}
+
+/* 响应式调整 - 日期编号生成器 */
+@media (max-width: 600px) {
+    .tool-container {
+        border-radius: 20px;
+    }
+    
+    .tool-header {
+        padding: 20px;
+    }
+    
+    .tool-header .tool-icon {
+        width: 50px;
+        height: 50px;
+        margin-right: 14px;
+    }
+    
+    .tool-header .tool-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .tool-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .tool-header p {
+        font-size: 0.8rem;
+    }
+    
+    .tool-content {
+        padding: 20px;
+    }
+    
+    .tool-buttons {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .tool-btn {
+        padding: 12px 16px;
+        font-size: 0.95rem;
+    }
+    
+    #display {
+        font-size: 1.4rem;
+        padding: 12px;
+    }
+    
+    .format-info {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+</style>
+</head>
+<body>
+    <div class="tool-container">
+        <div class="tool-header">
+            <div class="tool-icon">
+                <i class="fas fa-id-badge"></i>
+            </div>
+            <div class="tool-info">
+                <h1>日期和编号生成器</h1>
+                <p>生成基于日期的唯一编号，支持后缀递增和复制功能</p>
+            </div>
+        </div>
+
+        <div class="tool-content">
+            <div class="display-result">
+                <div class="display-label">
+                    <i class="fas fa-hashtag"></i> 生成的编号
+                </div>
+                <div id="display">2024072100000</div>
+            </div>
+
+            <div class="counter-display">
+                <span class="counter-label">当前后缀值:</span>
+                <span class="counter-value" id="counter-value">0</span>
+            </div>
+
+            <div class="tool-buttons">
+                <button class="tool-btn btn-primary" id="btn-generate">
+                    <i class="fas fa-plus-circle"></i> 生成初始编号
+                </button>
+                <button class="tool-btn btn-primary" id="btn-increment">
+                    <i class="fas fa-plus"></i> 后缀+1
+                </button>
+                <button class="tool-btn btn-primary" id="btn-copy">
+                    <i class="fas fa-copy"></i> 复制编号
+                </button>
+            </div>
+
+            <div class="format-info">
+                <i class="fas fa-info-circle"></i>
+                <span><strong>编号格式说明：</strong> 前8位为日期（YYYYMMDD），后5位为递增编号（从00000开始）</span>
+            </div>
+
+            <div id="alert-message" class="alert"></div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            let counter = 0;
+            let currentId = "";
+
+            const displayEl = document.getElementById('display');
+            const counterEl = document.getElementById('counter-value');
+            const alertEl = document.getElementById('alert-message');
+            const btnGenerate = document.getElementById('btn-generate');
+            const btnIncrement = document.getElementById('btn-increment');
+            const btnCopy = document.getElementById('btn-copy');
+
+            function formatDate(counter) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                return `${year}${month}${day}${counter.toString().padStart(5, '0')}`;
+            }
+
+            function displayDate() {
+                currentId = formatDate(counter);
+                displayEl.textContent = currentId;
+                counterEl.textContent = counter;
+            }
+
+            function removeAnimationClasses() {
+                displayEl.classList.remove('pulse-animation', 'copy-animation');
+            }
+
+            function generateInitial() {
+                counter = 0;
+                displayDate();
+                showAlert('已生成初始编号！', false);
+                removeAnimationClasses();
+                void displayEl.offsetWidth;
+                displayEl.classList.add('pulse-animation');
+                setTimeout(removeAnimationClasses, 500);
+            }
+
+            function incrementNumber() {
+                counter++;
+                displayDate();
+                showAlert('编号后缀已增加！', false);
+                removeAnimationClasses();
+                void displayEl.offsetWidth;
+                displayEl.classList.add('pulse-animation');
+                setTimeout(removeAnimationClasses, 500);
+            }
+
+            function copyToClipboard() {
+                if (!currentId) {
+                    showAlert('请先生成编号！', true);
+                    return;
+                }
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(currentId).then(function() {
+                        showAlert('编号已复制到剪贴板！', false);
+                        removeAnimationClasses();
+                        void displayEl.offsetWidth;
+                        displayEl.classList.add('copy-animation');
+                        setTimeout(removeAnimationClasses, 500);
+                    }).catch(function() {
+                        fallbackCopy(currentId);
+                    });
+                } else {
+                    fallbackCopy(currentId);
+                }
+            }
+
+            function fallbackCopy(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showAlert('编号已复制到剪贴板！', false);
+                    removeAnimationClasses();
+                    void displayEl.offsetWidth;
+                    displayEl.classList.add('copy-animation');
+                    setTimeout(removeAnimationClasses, 500);
+                } catch (err) {
+                    showAlert('复制失败，请手动复制！', true);
+                }
+                document.body.removeChild(textarea);
+            }
+
+            function showAlert(message, isError) {
+                alertEl.textContent = message;
+                alertEl.className = 'alert ' + (isError ? 'error' : 'success') + ' show';
+                setTimeout(function() {
+                    alertEl.classList.remove('show');
+                }, 3000);
+            }
+
+            btnGenerate.addEventListener('click', generateInitial);
+            btnIncrement.addEventListener('click', incrementNumber);
+            btnCopy.addEventListener('click', copyToClipboard);
+
+            displayDate();
+        })();
+    </script>
+</body>
+</html>

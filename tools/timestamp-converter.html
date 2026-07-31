@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间戳转化器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+:root {
+    --color-primary: #3683f7;
+    --color-primary-light: #5a9cff;
+    --color-primary-dark: #005bb5;
+    --color-secondary: #825ee4;
+    --color-accent: #11cdef;
+    --color-text-primary: #333;
+    --color-text-secondary: #666;
+    --color-text-muted: #999;
+    --color-text-inverse: #f0f0f0;
+    --color-bg-main: #f5f7fa;
+    --color-bg-gradient-start: #f5f7fa;
+    --color-bg-gradient-end: #e4e7eb;
+    --color-bg-card: #ffffff;
+    --color-bg-input: #f8f8f8;
+    --color-border: #e0e0e0;
+    --color-border-light: #f0f0f0;
+    --color-success: #4caf50;
+    --color-success-bg: #e8f5e9;
+    --color-error: #f44336;
+    --color-error-bg: #ffebee;
+    --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.08);
+    --shadow-primary: 0 4px 15px rgba(54, 131, 247, 0.3);
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --radius-full: 30px;
+    --transition-fast: all 0.2s ease;
+    --transition-normal: all 0.3s ease;
+    --transition-slow: all 0.5s ease;
+    --gradient-primary: linear-gradient(135deg, #3683f7, #5a9cff);
+    --gradient-success: linear-gradient(135deg, #2ecc71, #27ae60);
+    --gradient-error: linear-gradient(135deg, #ff6b6b, #ff5252);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--color-bg-gradient-start) 0%, var(--color-bg-gradient-end) 100%);
+    padding: 20px;
+    transition: var(--transition-slow);
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body.dark-mode {
+    background: linear-gradient(135deg, #1e1e1e 0%, #2c2c2c 100%);
+    --color-text-primary: #f0f0f0;
+    --color-text-secondary: #aaa;
+    --color-text-muted: #888;
+    --color-bg-card: #333;
+    --color-bg-input: #444;
+    --color-border: #555;
+    --color-border-light: #444;
+    --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.2);
+}
+
+.app-container {
+    width: 100%;
+    max-width: 500px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    transition: var(--transition-normal);
+    animation: slideUp 0.5s ease;
+}
+
+.app-header {
+    padding: 20px 25px 15px;
+    text-align: center;
+    position: relative;
+    background: var(--color-bg-card);
+    border-bottom: 1px solid var(--color-border-light);
+    transition: var(--transition-normal);
+}
+
+.app-header h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+    transition: var(--transition-normal);
+}
+
+.app-header p {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.5;
+    transition: var(--transition-normal);
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--color-bg-input);
+    border: none;
+    color: var(--color-text-primary);
+    padding: 8px 15px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle:hover {
+    background: var(--color-border);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.theme-toggle:active {
+    transform: translateY(1px);
+}
+
+.app-content {
+    padding: 25px;
+    transition: var(--transition-normal);
+}
+
+/* 当前时间戳显示 */
+.current-timestamp {
+    background: var(--color-bg-input);
+    border: 2px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    transition: var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.current-timestamp::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-primary);
+    border-radius: 4px 4px 0 0;
+}
+
+.current-timestamp-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.current-timestamp-values {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.timestamp-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timestamp-item .label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+}
+
+.timestamp-item .value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    font-family: 'Courier New', Courier, monospace;
+}
+
+body.dark-mode .timestamp-item .value {
+    color: var(--color-primary-light);
+}
+
+/* 选项卡导航 */
+.tab-nav {
+    display: flex;
+    background: var(--color-bg-input);
+    border-radius: var(--radius-full);
+    padding: 4px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    transition: var(--transition-normal);
+    font-weight: 500;
+}
+
+.tab-btn.active {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: var(--shadow-primary);
+}
+
+.tab-btn:hover:not(.active) {
+    background: rgba(54, 131, 247, 0.1);
+}
+
+/* 选项卡内容 */
+.tab-content {
+    position: relative;
+}
+
+.tab-pane {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* 精度选择 */
+.precision-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.precision-btn {
+    padding: 6px 14px;
+    border: 2px solid var(--color-border);
+    background: transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    transition: var(--transition-fast);
+    font-weight: 500;
+}
+
+.precision-btn.active {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: rgba(54, 131, 247, 0.1);
+}
+
+.precision-btn:hover:not(.active) {
+    border-color: var(--color-primary-light);
+}
+
+/* 时区选择 */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+    transition: var(--transition-normal);
+}
+
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+    background: var(--color-bg-input);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: var(--transition-normal);
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.form-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(54, 131, 247, 0.15);
+}
+
+/* 输入框 */
+.form-input {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+    background: var(--color-bg-input);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    outline: none;
+    transition: var(--transition-normal);
+    font-family: inherit;
+}
+
+.form-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(54, 131, 247, 0.15);
+}
+
+.form-input::placeholder {
+    color: var(--color-text-muted);
+}
+
+/* 转换按钮 */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background: var(--gradient-primary);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: var(--transition-normal);
+    box-shadow: var(--shadow-primary);
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn i {
+    margin-right: 10px;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(54, 131, 247, 0.4);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: var(--color-bg-input);
+    color: var(--color-text-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+    background: var(--color-border);
+    box-shadow: var(--shadow-md);
+}
+
+body.dark-mode .btn-secondary {
+    background: var(--color-bg-input);
+    color: var(--color-text-inverse);
+}
+
+body.dark-mode .btn-secondary:hover {
+    background: var(--color-border);
+}
+
+/* 结果显示 */
+.result-container {
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--color-bg-input);
+    border-radius: var(--radius-md);
+    text-align: center;
+    transition: var(--transition-normal);
+    display: none;
+}
+
+.result-container.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.result-container.success {
+    background: linear-gradient(135deg, rgba(54, 131, 247, 0.1), rgba(90, 156, 255, 0.1));
+    border: 2px solid var(--color-primary);
+}
+
+.result-container.error {
+    background: linear-gradient(135deg, rgba(245, 108, 108, 0.1), rgba(245, 108, 108, 0.1));
+    border: 2px solid var(--color-error);
+}
+
+.result-label {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 10px;
+}
+
+.result-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    transition: var(--transition-normal);
+    word-break: break-all;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.result-container.success .result-value {
+    color: var(--color-primary);
+}
+
+.result-container.error .result-value {
+    color: var(--color-error);
+}
+
+.result-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+.btn-copy {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-copy:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-primary);
+}
+
+/* 批量转换 */
+.batch-textarea {
+    width: 100%;
+    height: 120px;
+    padding: 14px 18px;
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+    background: var(--color-bg-input);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    outline: none;
+    transition: var(--transition-normal);
+    font-family: 'Courier New', Courier, monospace;
+    resize: vertical;
+}
+
+.batch-textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(54, 131, 247, 0.15);
+}
+
+.batch-textarea::placeholder {
+    color: var(--color-text-muted);
+}
+
+.batch-results {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 15px;
+    display: none;
+}
+
+.batch-results.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.batch-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.batch-table th,
+.batch-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border-light);
+    font-size: 0.85rem;
+}
+
+.batch-table th {
+    background: var(--color-bg-input);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+}
+
+.batch-table td {
+    color: var(--color-text-primary);
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.batch-table tr:hover td {
+    background: rgba(54, 131, 247, 0.05);
+}
+
+.batch-error {
+    color: var(--color-error) !important;
+}
+
+/* 历史记录 */
+.history-section {
+    margin-top: 25px;
+    padding: 20px;
+    background: var(--color-bg-input);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--color-border);
+    transition: var(--transition-normal);
+    display: none;
+}
+
+.history-section.show {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.history-title {
+    color: var(--color-primary);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: var(--transition-normal);
+}
+
+.history-title span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-clear {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.history-clear:hover {
+    color: var(--color-error);
+}
+
+.history-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--color-bg-card);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    border: 1px solid var(--color-border-light);
+    transition: var(--transition-fast);
+}
+
+.history-item:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.history-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.history-item-type {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-bottom: 2px;
+}
+
+.history-item-value {
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+    font-family: 'Courier New', Courier, monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-item-result {
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    font-family: 'Courier New', Courier, monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: 10px;
+    max-width: 200px;
+}
+
+.history-item-copy {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 8px;
+    transition: var(--transition-fast);
+}
+
+.history-item-copy:hover {
+    color: var(--color-primary);
+}
+
+.history-empty {
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    padding: 20px;
+}
+
+/* 提示信息 */
+.alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.alert.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.alert.success {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+}
+
+.alert.error {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+    color: white;
+}
+
+/* 动画 */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* 响应式 */
+@media (max-width: 520px) {
+    .app-container {
+        max-width: 95vw;
+    }
+
+    .app-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .app-header p {
+        font-size: 0.9rem;
+    }
+
+    .theme-toggle {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin: 15px auto 5px;
+        max-width: 160px;
+    }
+
+    .app-header {
+        padding-top: 20px;
+    }
+
+    .tab-btn {
+        font-size: 0.78rem;
+        padding: 8px 10px;
+    }
+
+    .timestamp-item .value {
+        font-size: 1.1rem;
+    }
+
+    .result-value {
+        font-size: 1rem;
+    }
+
+    .history-item-result {
+        max-width: 120px;
+    }
+}
+</style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="app-header">
+            <h1><i class="fas fa-exchange-alt"></i> 时间戳转化器</h1>
+            <p>时间戳与日期时间相互转换</p>
+            <button class="theme-toggle" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i> 暗色模式
+            </button>
+        </div>
+        <div class="app-content">
+            <!-- 当前时间戳显示 -->
+            <div class="current-timestamp">
+                <div class="current-timestamp-label">
+                    <i class="fas fa-stopwatch"></i> 当前时间戳
+                </div>
+                <div class="current-timestamp-values">
+                    <div class="timestamp-item">
+                        <span class="label">秒 (s)</span>
+                        <span class="value" id="current-ts-sec">---</span>
+                    </div>
+                    <div class="timestamp-item">
+                        <span class="label">毫秒 (ms)</span>
+                        <span class="value" id="current-ts-ms">---</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 选项卡导航 -->
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="ts-to-date">时间戳转日期</button>
+                <button class="tab-btn" data-tab="date-to-ts">日期转时间戳</button>
+                <button class="tab-btn" data-tab="batch">批量转换</button>
+            </div>
+
+            <!-- 选项卡内容 -->
+            <div class="tab-content">
+                <!-- 时间戳转日期 -->
+                <div class="tab-pane active" id="ts-to-date">
+                    <div class="form-group">
+                        <label class="form-label">精度选择</label>
+                        <div class="precision-group">
+                            <button class="precision-btn active" data-precision="s">秒 (s)</button>
+                            <button class="precision-btn" data-precision="ms">毫秒 (ms)</button>
+                            <button class="precision-btn" data-precision="us">微秒 (µs)</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">时区选择</label>
+                        <select class="form-select" id="tz-ts-to-date">
+                            <option value="local">本地时区</option>
+                            <option value="utc">UTC</option>
+                            <option value="beijing">北京时间 (UTC+8)</option>
+                            <option value="tokyo">东京时间 (UTC+9)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">输入时间戳</label>
+                        <input type="text" class="form-input" id="input-ts" placeholder="请输入时间戳，如: 1625000000">
+                    </div>
+                    <button class="btn" onclick="convertTsToDate()">
+                        <i class="fas fa-exchange-alt"></i> 转换
+                    </button>
+                    <div class="result-container" id="result-ts-to-date">
+                        <div class="result-label">转换结果</div>
+                        <div class="result-value" id="result-ts-to-date-value"></div>
+                        <div class="result-actions">
+                            <button class="btn-copy" onclick="copyResult('result-ts-to-date-value')">
+                                <i class="far fa-copy"></i> 复制
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 日期转时间戳 -->
+                <div class="tab-pane" id="date-to-ts">
+                    <div class="form-group">
+                        <label class="form-label">选择日期时间</label>
+                        <input type="datetime-local" class="form-input" id="input-date" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">或输入日期文本</label>
+                        <input type="text" class="form-input" id="input-date-text" placeholder="如: 2021-06-30 12:00:00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">输出精度</label>
+                        <div class="precision-group">
+                            <button class="precision-btn active" data-precision="s">秒 (s)</button>
+                            <button class="precision-btn" data-precision="ms">毫秒 (ms)</button>
+                            <button class="precision-btn" data-precision="us">微秒 (µs)</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">时区选择</label>
+                        <select class="form-select" id="tz-date-to-ts">
+                            <option value="local">本地时区</option>
+                            <option value="utc">UTC</option>
+                            <option value="beijing">北京时间 (UTC+8)</option>
+                            <option value="tokyo">东京时间 (UTC+9)</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="convertDateToTs()">
+                        <i class="fas fa-exchange-alt"></i> 转换
+                    </button>
+                    <div class="result-container" id="result-date-to-ts">
+                        <div class="result-label">转换结果</div>
+                        <div class="result-value" id="result-date-to-ts-value"></div>
+                        <div class="result-actions">
+                            <button class="btn-copy" onclick="copyResult('result-date-to-ts-value')">
+                                <i class="far fa-copy"></i> 复制
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 批量转换 -->
+                <div class="tab-pane" id="batch">
+                    <div class="form-group">
+                        <label class="form-label">输入多个时间戳（每行一个）</label>
+                        <textarea class="batch-textarea" id="batch-input" placeholder="每行输入一个时间戳&#10;例如:&#10;1625000000&#10;1625000000000&#10;1625000000000000"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">精度选择</label>
+                        <div class="precision-group">
+                            <button class="precision-btn active" data-precision="s">秒 (s)</button>
+                            <button class="precision-btn" data-precision="ms">毫秒 (ms)</button>
+                            <button class="precision-btn" data-precision="us">微秒 (µs)</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">时区选择</label>
+                        <select class="form-select" id="tz-batch">
+                            <option value="local">本地时区</option>
+                            <option value="utc">UTC</option>
+                            <option value="beijing">北京时间 (UTC+8)</option>
+                            <option value="tokyo">东京时间 (UTC+9)</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="convertBatch()">
+                        <i class="fas fa-exchange-alt"></i> 批量转换
+                    </button>
+                    <div class="batch-results" id="batch-results">
+                        <table class="batch-table">
+                            <thead>
+                                <tr>
+                                    <th>输入</th>
+                                    <th>结果</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batch-results-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 历史记录 -->
+            <div class="history-section" id="history-section">
+                <div class="history-title">
+                    <span><i class="fas fa-history"></i> 历史记录</span>
+                    <button class="history-clear" onclick="clearHistory()">清空</button>
+                </div>
+                <div class="history-list" id="history-list">
+                    <div class="history-empty">暂无历史记录</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert" id="alert"></div>
+
+    <script>
+        // 全局状态
+        let currentTab = 'ts-to-date';
+        let currentPrecision = {
+            'ts-to-date': 's',
+            'date-to-ts': 's',
+            'batch': 's'
+        };
+        let history = JSON.parse(localStorage.getItem('timestamp-converter-history') || '[]');
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查暗色模式偏好
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.theme-toggle').innerHTML = '<i class="fas fa-sun"></i> 亮色模式';
+            }
+
+            // 启动实时时间戳更新
+            updateCurrentTimestamp();
+            setInterval(updateCurrentTimestamp, 1000);
+
+            // 渲染历史记录
+            renderHistory();
+
+            // 选项卡切换
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var tab = this.getAttribute('data-tab');
+                    switchTab(tab);
+                });
+            });
+
+            // 精度选择（每个选项卡独立）
+            document.querySelectorAll('.tab-pane').forEach(function(pane) {
+                var paneId = pane.id;
+                pane.querySelectorAll('.precision-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var precision = this.getAttribute('data-precision');
+                        pane.querySelectorAll('.precision-btn').forEach(function(b) { b.classList.remove('active'); });
+                        this.classList.add('active');
+                        currentPrecision[paneId] = precision;
+                    });
+                });
+            });
+        });
+
+        // 切换选项卡
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
+            });
+            document.querySelectorAll('.tab-pane').forEach(function(pane) {
+                pane.classList.toggle('active', pane.id === tab);
+            });
+
+            // 批量转换不显示历史记录
+            var historySection = document.getElementById('history-section');
+            if (tab === 'batch') {
+                historySection.classList.remove('show');
+            } else {
+                historySection.classList.add('show');
+            }
+        }
+
+        // 更新当前时间戳
+        function updateCurrentTimestamp() {
+            var now = Date.now();
+            document.getElementById('current-ts-sec').textContent = Math.floor(now / 1000);
+            document.getElementById('current-ts-ms').textContent = now;
+        }
+
+        // 获取时区偏移（分钟）
+        function getTimezoneOffset(tz) {
+            switch (tz) {
+                case 'utc': return 0;
+                case 'beijing': return 480;
+                case 'tokyo': return 540;
+                case 'local': return -new Date().getTimezoneOffset();
+                default: return -new Date().getTimezoneOffset();
+            }
+        }
+
+        // 格式化日期为指定时区
+        function formatDateByTimezone(date, tz) {
+            var offset = getTimezoneOffset(tz);
+            var utc = date.getTime() + (date.getTimezoneOffset() * 60000);
+            var targetDate = new Date(utc + (offset * 60000));
+
+            var year = targetDate.getFullYear();
+            var month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
+            var day = targetDate.getDate().toString().padStart(2, '0');
+            var hours = targetDate.getHours().toString().padStart(2, '0');
+            var minutes = targetDate.getMinutes().toString().padStart(2, '0');
+            var seconds = targetDate.getSeconds().toString().padStart(2, '0');
+            var ms = targetDate.getMilliseconds().toString().padStart(3, '0');
+
+            return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds + '.' + ms;
+        }
+
+        // 时间戳转日期
+        function convertTsToDate() {
+            var input = document.getElementById('input-ts').value.trim();
+            var precision = currentPrecision['ts-to-date'];
+            var tz = document.getElementById('tz-ts-to-date').value;
+            var resultContainer = document.getElementById('result-ts-to-date');
+            var resultValue = document.getElementById('result-ts-to-date-value');
+
+            if (!input) {
+                showResult(resultContainer, resultValue, '请输入时间戳', false);
+                return;
+            }
+
+            var ts = parseFloat(input);
+            if (isNaN(ts)) {
+                showResult(resultContainer, resultValue, '无效的时间戳', false);
+                return;
+            }
+
+            // 根据精度转换
+            var timestamp;
+            if (precision === 's') {
+                timestamp = ts * 1000;
+            } else if (precision === 'ms') {
+                timestamp = ts;
+            } else if (precision === 'us') {
+                timestamp = ts / 1000;
+            }
+
+            var date = new Date(timestamp);
+
+            if (isNaN(date.getTime())) {
+                showResult(resultContainer, resultValue, '无效的时间戳', false);
+                return;
+            }
+
+            var result = formatDateByTimezone(date, tz);
+            showResult(resultContainer, resultValue, result, true);
+
+            // 添加到历史记录
+            addToHistory('时间戳转日期', input, result);
+        }
+
+        // 日期转时间戳
+        function convertDateToTs() {
+            var dateInput = document.getElementById('input-date').value;
+            var textInput = document.getElementById('input-date-text').value.trim();
+            var precision = currentPrecision['date-to-ts'];
+            var tz = document.getElementById('tz-date-to-ts').value;
+            var resultContainer = document.getElementById('result-date-to-ts');
+            var resultValue = document.getElementById('result-date-to-ts-value');
+
+            var date;
+
+            if (dateInput) {
+                // 使用日期选择器
+                date = new Date(dateInput);
+            } else if (textInput) {
+                // 使用文本输入
+                date = new Date(textInput.replace(/-/g, '/'));
+            } else {
+                showResult(resultContainer, resultValue, '请选择或输入日期时间', false);
+                return;
+            }
+
+            if (isNaN(date.getTime())) {
+                showResult(resultContainer, resultValue, '无效的日期格式', false);
+                return;
+            }
+
+            // 根据时区调整
+            var offset = getTimezoneOffset(tz);
+            var utc = date.getTime() - (offset * 60000);
+            var targetDate = new Date(utc);
+
+            var timestamp = targetDate.getTime();
+            var result;
+            if (precision === 's') {
+                result = Math.floor(timestamp / 1000).toString();
+            } else if (precision === 'ms') {
+                result = timestamp.toString();
+            } else if (precision === 'us') {
+                result = (timestamp * 1000).toString();
+            }
+
+            showResult(resultContainer, resultValue, result, true);
+
+            // 添加到历史记录
+            var inputDisplay = dateInput || textInput;
+            addToHistory('日期转时间戳', inputDisplay, result);
+        }
+
+        // 批量转换
+        function convertBatch() {
+            var input = document.getElementById('batch-input').value.trim();
+            var precision = currentPrecision['batch'];
+            var tz = document.getElementById('tz-batch').value;
+            var resultsContainer = document.getElementById('batch-results');
+            var resultsBody = document.getElementById('batch-results-body');
+
+            if (!input) {
+                showAlert('请输入至少一个时间戳', 'error');
+                return;
+            }
+
+            var lines = input.split('\n');
+            var html = '';
+
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].trim();
+                if (!line) continue;
+
+                var ts = parseFloat(line);
+                if (isNaN(ts)) {
+                    html += '<tr><td style="font-family: inherit;">' + escapeHtml(line) + '</td><td class="batch-error">无效的时间戳</td></tr>';
+                    continue;
+                }
+
+                var timestamp;
+                if (precision === 's') {
+                    timestamp = ts * 1000;
+                } else if (precision === 'ms') {
+                    timestamp = ts;
+                } else if (precision === 'us') {
+                    timestamp = ts / 1000;
+                }
+
+                var date = new Date(timestamp);
+
+                if (isNaN(date.getTime())) {
+                    html += '<tr><td style="font-family: inherit;">' + escapeHtml(line) + '</td><td class="batch-error">无效的时间戳</td></tr>';
+                    continue;
+                }
+
+                var result = formatDateByTimezone(date, tz);
+                html += '<tr><td style="font-family: inherit;">' + escapeHtml(line) + '</td><td>' + result + '</td></tr>';
+            }
+
+            resultsBody.innerHTML = html;
+            resultsContainer.classList.add('show');
+        }
+
+        // 显示结果
+        function showResult(container, valueEl, message, isSuccess) {
+            container.classList.add('show');
+            container.classList.remove('success', 'error');
+            container.classList.add(isSuccess ? 'success' : 'error');
+            valueEl.textContent = message;
+        }
+
+        // 复制结果
+        function copyResult(elementId) {
+            var text = document.getElementById(elementId).textContent;
+            if (!text) return;
+
+            navigator.clipboard.writeText(text).then(function() {
+                showAlert('已复制到剪贴板', 'success');
+            }).catch(function() {
+                // 降级方案
+                var textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showAlert('已复制到剪贴板', 'success');
+            });
+        }
+
+        // 添加到历史记录
+        function addToHistory(type, input, result) {
+            var item = {
+                type: type,
+                input: input,
+                result: result,
+                time: Date.now()
+            };
+
+            // 避免重复
+            history = history.filter(function(h) { return !(h.type === type && h.input === input); });
+
+            history.unshift(item);
+            if (history.length > 10) {
+                history = history.slice(0, 10);
+            }
+
+            localStorage.setItem('timestamp-converter-history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        // 渲染历史记录
+        function renderHistory() {
+            var list = document.getElementById('history-list');
+
+            if (history.length === 0) {
+                list.innerHTML = '<div class="history-empty">暂无历史记录</div>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < history.length; i++) {
+                var item = history[i];
+                html += '<div class="history-item">';
+                html += '<div class="history-item-info">';
+                html += '<div class="history-item-type">' + escapeHtml(item.type) + '</div>';
+                html += '<div class="history-item-value">' + escapeHtml(item.input) + '</div>';
+                html += '</div>';
+                html += '<div class="history-item-result">' + escapeHtml(item.result) + '</div>';
+                html += '<button class="history-item-copy" onclick="copyHistoryItem(' + i + ')"><i class="far fa-copy"></i></button>';
+                html += '</div>';
+            }
+
+            list.innerHTML = html;
+        }
+
+        // 复制历史记录项
+        function copyHistoryItem(index) {
+            var text = history[index].result;
+            navigator.clipboard.writeText(text).then(function() {
+                showAlert('已复制到剪贴板', 'success');
+            }).catch(function() {
+                showAlert('复制失败', 'error');
+            });
+        }
+
+        // 清空历史记录
+        function clearHistory() {
+            history = [];
+            localStorage.removeItem('timestamp-converter-history');
+            renderHistory();
+            showAlert('历史记录已清空', 'success');
+        }
+
+        // HTML转义
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 显示提示
+        function showAlert(message, type) {
+            var alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = 'alert ' + type + ' show';
+
+            setTimeout(function() {
+                alert.classList.remove('show');
+            }, 2500);
+        }
+
+        // 暗色模式切换
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+
+            var btn = document.querySelector('.theme-toggle');
+            if (document.body.classList.contains('dark-mode')) {
+                btn.innerHTML = '<i class="fas fa-sun"></i> 亮色模式';
+            } else {
+                btn.innerHTML = '<i class="fas fa-moon"></i> 暗色模式';
+            }
+
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+    </script>
+</body>
+</html>

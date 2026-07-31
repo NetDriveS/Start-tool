@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>金陵时光机 - Nanjing Time Machine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --nj-red: #c41e3a;
+    --nj-gold: #d4a84b;
+    --nj-green: #2d5a27;
+    --nj-blue: #1e3a5f;
+    --nj-cream: #f5f0e6;
+    --nj-river: #4a7c6f;
+    
+    --bg-primary: #faf8f5;
+    --bg-secondary: #f0ede8;
+    --bg-card: rgba(255, 255, 255, 0.95);
+    --bg-elevated: #ffffff;
+    
+    --text-primary: #1a1a1a;
+    --text-secondary: #555555;
+    --text-muted: #999999;
+    
+    --accent-gold: #d4a84b;
+    --accent-red: #c41e3a;
+    --accent-teal: #4a7c6f;
+    
+    --border-subtle: rgba(196, 30, 58, 0.1);
+    --border-active: rgba(196, 30, 58, 0.35);
+    
+    --shadow: 0 4px 24px rgba(196, 30, 58, 0.08);
+    --shadow-lg: 0 8px 40px rgba(196, 30, 58, 0.12);
+    --shadow-glow: 0 0 30px rgba(196, 30, 58, 0.1);
+    
+    --radius-lg: 24px;
+    --radius-md: 18px;
+    --radius-sm: 14px;
+    --radius-xs: 10px;
+    
+    --safe-area-top: env(safe-area-inset-top);
+    --safe-area-bottom: env(safe-area-inset-bottom);
+}
+
+.jinling-body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro SC', 'SF Pro Text', 'Noto Serif SC', 'Noto Serif SC', 'Source Han Serif SC', Georgia, serif;
+    background: linear-gradient(180deg, #ffffff 0%, #faf8f5 50%, #f5f2ed 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+}
+
+.status-bar-spacer {
+    height: var(--safe-area-top, 47px);
+    background: transparent;
+}
+
+.header-ios {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid var(--border-subtle);
+    box-shadow: 0 2px 20px rgba(196, 30, 58, 0.08);
+}
+
+.header-title {
+    text-align: center;
+    padding: 16px 20px 12px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--nj-gold), var(--nj-red));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.main-content {
+    position: relative;
+    padding: 0 16px 100px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.section-ios {
+    margin-bottom: 24px;
+}
+
+.section-header {
+    padding: 0 20px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.card-ios {
+    background: white;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-subtle);
+}
+
+.card-ios + .card-ios {
+    margin-top: 16px;
+}
+
+.card-ios.compact {
+    border-radius: var(--radius-sm);
+}
+
+.card-ios:has(input[type="date"]) {
+    overflow: visible;
+    z-index: 10;
+}
+
+.tab-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    height: 56px;
+    padding: 0 12px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-radius: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    border: 1px solid var(--border-subtle);
+}
+
+.tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 40px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.tab-item i {
+    font-size: 20px;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.tab-item span {
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    margin-top: 1px;
+}
+
+.tab-item.active {
+    background: rgba(196, 30, 58, 0.1);
+    width: 64px;
+}
+
+.tab-item.active i {
+    color: var(--nj-red);
+    transform: scale(1.1);
+}
+
+.tab-item.active span {
+    color: var(--nj-red);
+    font-weight: 600;
+}
+
+.tab-item:active {
+    transform: scale(0.92);
+}
+
+.page {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.page.active {
+    display: block;
+}
+
+.jinling-fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px;
+}
+
+.grid-item {
+    background: white;
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 8px rgba(196, 30, 58, 0.06);
+}
+
+.grid-item:active {
+    transform: scale(0.97);
+}
+
+.grid-item.selected {
+    border-color: var(--nj-red);
+    background: rgba(196, 30, 58, 0.05);
+    box-shadow: 0 4px 15px rgba(196, 30, 58, 0.15);
+}
+
+.grid-item i {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.grid-item span {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.textarea-ios {
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    background: rgba(255, 255, 255, 0.04);
+    font-family: inherit;
+    font-size: 16px;
+    resize: none;
+    height: 100px;
+    outline: none;
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+}
+
+.textarea-ios:focus {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 0 1px var(--border-active);
+}
+
+.textarea-ios::placeholder {
+    color: var(--text-muted);
+}
+
+.btn-ios {
+    width: calc(100% - 32px);
+    margin: 0 16px 16px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--nj-red), #8b0000);
+    color: white;
+    border: none;
+    border-radius: var(--radius-xs);
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.btn-ios:active {
+    transform: scale(0.98);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-ios:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-ios.secondary {
+    background: linear-gradient(135deg, var(--nj-gold), #aa7d0c);
+}
+
+.emotion-section {
+    padding: 20px 16px 140px;
+}
+
+.emotion-grid {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.emotion-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 2px solid rgba(212, 168, 75, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 26px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.emotion-btn:active {
+    transform: scale(0.9);
+}
+
+.emotion-btn.selected {
+    border-color: var(--nj-gold);
+    background: linear-gradient(135deg, var(--nj-gold), var(--nj-red));
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(212, 168, 75, 0.4);
+}
+
+.emotion-labels {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 4px;
+}
+
+.emotion-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-align: center;
+    width: 54px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 16px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sm);
+    padding: 16px 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(212, 168, 75, 0.1);
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--nj-gold), var(--nj-red));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 4px;
+}
+
+.mood-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 120px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sm);
+    margin: 0 16px 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(212, 168, 75, 0.1);
+}
+
+.mood-bar {
+    flex: 1;
+    margin: 0 4px;
+    background: linear-gradient(to top, var(--nj-red), var(--nj-gold));
+    border-radius: 6px 6px 0 0;
+    transition: height 0.4s ease;
+    min-height: 8px;
+}
+
+.idea-card {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin: 12px 16px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-left: 4px solid var(--nj-gold);
+}
+
+.idea-card .tag {
+    position: absolute;
+    top: -6px;
+    right: 16px;
+    background: linear-gradient(135deg, var(--nj-gold), var(--nj-red));
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.idea-card p {
+    font-size: 15px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+    word-break: break-word;
+}
+
+.idea-card .time {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 10px;
+}
+
+.capsule-card {
+    background: linear-gradient(135deg, rgba(30, 58, 95, 0.9), rgba(13, 27, 42, 0.9));
+    color: white;
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin: 12px 16px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(212, 168, 75, 0.2);
+}
+
+.capsule-card::before {
+    content: '';
+    position: absolute;
+    right: -10px;
+    bottom: -20px;
+    font-size: 80px;
+    opacity: 0.1;
+}
+
+.capsule-card.opened {
+    background: linear-gradient(135deg, rgba(74, 124, 111, 0.9), rgba(45, 74, 62, 0.9));
+}
+
+.capsule-card .message {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: var(--radius-xs);
+    margin: 12px 0;
+    font-size: 15px;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.capsule-card .date {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.countdown-box {
+    text-align: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-xs);
+    margin-bottom: 12px;
+}
+
+.countdown-number {
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.countdown-label {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 4px;
+}
+
+.art-canvas-wrapper {
+    position: relative;
+    margin: 16px;
+    overflow: visible;
+    z-index: 50;
+}
+
+.art-canvas {
+    width: calc(100% - 32px);
+    margin: 0 16px;
+    height: 300px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    overflow: hidden;
+    position: relative;
+}
+
+.art-canvas canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.canvas-decoration {
+    position: absolute;
+    pointer-events: none;
+}
+
+.canvas-decoration.top-left {
+    top: 12px;
+    left: 12px;
+    width: 60px;
+    height: 60px;
+    border: 2px solid rgba(212, 168, 75, 0.3);
+    border-radius: 50%;
+    border-top-color: transparent;
+    border-left-color: transparent;
+    transform: rotate(-45deg);
+}
+
+.canvas-decoration.top-right {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(196, 30, 58, 0.3);
+    border-radius: 50%;
+    border-bottom-color: transparent;
+    border-right-color: transparent;
+}
+
+.canvas-decoration.bottom-center {
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.canvas-decoration .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(212, 168, 75, 0.5);
+}
+
+.canvas-decoration .line {
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 168, 75, 0.5), transparent);
+}
+
+.art-controls {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 0 16px 12px;
+    position: relative;
+    z-index: 100;
+}
+
+.save-section {
+    padding: 0 16px 16px;
+    position: relative;
+    z-index: 100;
+}
+
+.save-btn {
+    width: 100%;
+    background: var(--nj-red) !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: 0 4px 16px rgba(196, 30, 58, 0.25);
+}
+
+.art-btn {
+    padding: 12px 10px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xs);
+    background: white;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(196, 30, 58, 0.08);
+    color: var(--text-primary);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.art-btn:active {
+    transform: scale(0.97);
+}
+
+.art-btn.primary {
+    background: white;
+    color: var(--nj-red);
+    font-weight: 600;
+    box-shadow: 0 4px 16px rgba(196, 30, 58, 0.15);
+    border: 2px solid var(--nj-red);
+}
+
+.art-btn.primary:hover {
+    box-shadow: 0 6px 24px rgba(196, 30, 58, 0.25);
+    transform: translateY(-2px);
+    background: var(--nj-red);
+    color: white;
+}
+
+.color-templates {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-md);
+    margin: 0 16px 16px;
+    box-shadow: var(--shadow);
+}
+
+.color-templates-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--nj-red);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.color-swatches {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.color-swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.color-swatch:hover {
+    transform: scale(1.1);
+}
+
+.color-swatch .swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.color-swatch .label {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    max-width: 50px;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    background: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    box-shadow: 0 2px 10px rgba(196, 30, 58, 0.06);
+    color: var(--text-secondary);
+}
+
+.filter-btn:active {
+    transform: scale(0.95);
+}
+
+.filter-btn.active {
+    background: var(--nj-red);
+    color: white;
+    border-color: var(--nj-red);
+    box-shadow: 0 4px 16px rgba(196, 30, 58, 0.25);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 12px;
+    color: var(--nj-gold);
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 15px;
+}
+
+.jinling-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: linear-gradient(135deg, var(--nj-red), #8b0000);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-lg);
+}
+
+.jinling-toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.input-ios {
+    width: calc(100% - 32px);
+    margin: 0 16px 12px;
+    padding: 12px 16px;
+    border: 2px solid rgba(212, 168, 75, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-xs);
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+    color: rgba(255, 255, 255, 0.9);
+    box-sizing: border-box;
+}
+
+.input-ios:focus {
+    border-color: var(--nj-gold);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.watermark {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    font-size: 11px;
+    color: rgba(212, 168, 75, 0.3);
+    writing-mode: vertical-rl;
+    letter-spacing: 3px;
+}
+
+.jinling-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.jinling-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+</style>
+</head>
+<body class="jinling-body">
+    <div class="status-bar-spacer"></div>
+
+    <div class="header-ios">
+        <div class="header-title">🏛️ 金陵时光机</div>
+    </div>
+
+    <div class="main-content">
+        <div id="page-inspiration" class="page active">
+            <div class="section-ios">
+                <div class="section-header">选择灵感地标</div>
+                <div class="grid-2">
+                    <div class="grid-item" data-landmark="mingxiaoling" onclick="selectLandmark(this)">
+                        <i class="fas fa-dragon" style="color: var(--nj-red);"></i>
+                        <span>明孝陵</span>
+                    </div>
+                    <div class="grid-item" data-landmark="xuanwuhu" onclick="selectLandmark(this)">
+                        <i class="fas fa-water" style="color: var(--nj-river);"></i>
+                        <span>玄武湖</span>
+                    </div>
+                    <div class="grid-item" data-landmark="zhonghuamen" onclick="selectLandmark(this)">
+                        <i class="fas fa-archway" style="color: var(--nj-gold);"></i>
+                        <span>中华门</span>
+                    </div>
+                    <div class="grid-item" data-landmark="zijinshan" onclick="selectLandmark(this)">
+                        <i class="fas fa-mountain" style="color: var(--nj-green);"></i>
+                        <span>紫金山</span>
+                    </div>
+                    <div class="grid-item" data-landmark="qinhuai" onclick="selectLandmark(this)">
+                        <i class="fas fa-ship" style="color: var(--nj-blue);"></i>
+                        <span>秦淮河</span>
+                    </div>
+                    <div class="grid-item" data-landmark="puluji" onclick="selectLandmark(this)">
+                        <i class="fas fa-store" style="color: var(--nj-gold);"></i>
+                        <span>夫子庙</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-ios">
+                <div class="section-header">记录灵感</div>
+                <div class="card-ios">
+                    <textarea class="textarea-ios" id="inspiration-text" placeholder="在南京的哪个角落获得了灵感？"></textarea>
+                    <button class="btn-ios" onclick="saveInspiration()">保存灵感 💡</button>
+                </div>
+            </div>
+
+            <div class="section-ios">
+                <div class="section-header">我的灵感库</div>
+                <div id="inspiration-list">
+                    <div class="empty-state">
+                        <i class="fas fa-feather-alt"></i>
+                        <p>暂无灵感记录<br>去探索南京的美吧！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-art" class="page">
+            <div class="section-ios">
+                <div class="section-header">金陵生成艺术</div>
+                <div class="card-ios">
+                    <div class="art-canvas-wrapper">
+                        <div class="art-canvas">
+                            <canvas id="art-canvas"></canvas>
+                            <div class="canvas-decoration top-left"></div>
+                            <div class="canvas-decoration top-right"></div>
+                            <div class="canvas-decoration bottom-center">
+                                <div class="line"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="line"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="art-controls">
+                        <button class="art-btn primary" onclick="generateArt('nanjing')">🎨 金陵花雨</button>
+                        <button class="art-btn" onclick="generateArt('river')">🌊 秦淮灯影</button>
+                        <button class="art-btn" onclick="generateArt('mountain')">🏔️ 紫金云霞</button>
+                        <button class="art-btn" onclick="generateArt('mint')">🍃 梧桐叶语</button>
+                        <button class="art-btn" onclick="generateArt('imperial')">👑 帝王气象</button>
+                        <button class="art-btn" onclick="generateArt('elegant')">🌸 雅致古都</button>
+                        <button class="art-btn" onclick="generateArt('moonlight')">🌙 月下金陵</button>
+                    </div>
+                    
+                    <div class="save-section">
+                        <button class="art-btn save-btn" onclick="saveArtwork()">💾 保存作品</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-ios">
+                <div class="section-header">滤镜效果</div>
+                <div class="filter-bar">
+                    <button class="filter-btn active" onclick="applyFilter('none', this)">原图</button>
+                    <button class="filter-btn" onclick="applyFilter('vintage', this)">复古</button>
+                    <button class="filter-btn" onclick="applyFilter('dramatic', this)">戏剧</button>
+                    <button class="filter-btn" onclick="applyFilter('moonlight', this)">月光</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-mood" class="page">
+            <div class="section-ios">
+                <div class="section-header">今日心情</div>
+                <div class="card-ios emotion-section">
+                    <textarea class="textarea-ios" id="mood-note" placeholder="今天在南京发生了什么值得记录的事？"></textarea>
+                    <button class="btn-ios secondary" onclick="saveMood()">记录心情 📝</button>
+                    
+                    <div class="emotion-grid" style="margin-top: 24px;">
+                        <button class="emotion-btn" data-emotion="happy" onclick="selectEmotion('happy')">😊</button>
+                        <button class="emotion-btn" data-emotion="peaceful" onclick="selectEmotion('peaceful')">😌</button>
+                        <button class="emotion-btn" data-emotion="excited" onclick="selectEmotion('excited')">🤩</button>
+                        <button class="emotion-btn" data-emotion="melancholy" onclick="selectEmotion('melancholy')">😔</button>
+                        <button class="emotion-btn" data-emotion="anxious" onclick="selectEmotion('anxious')">😰</button>
+                    </div>
+                    <div class="emotion-labels">
+                        <div class="emotion-label">开心</div>
+                        <div class="emotion-label">平静</div>
+                        <div class="emotion-label">兴奋</div>
+                        <div class="emotion-label">忧伤</div>
+                        <div class="emotion-label">焦虑</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-ios">
+                <div class="section-header">心情统计</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-moods">0</div>
+                        <div class="stat-label">记录天数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="happy-days">0</div>
+                        <div class="stat-label">开心日子</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="streak">0</div>
+                        <div class="stat-label">连续天数</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-ios">
+                <div class="section-header">本周心情</div>
+                <div class="mood-chart" id="mood-chart">
+                    <div class="mood-bar" style="height: 20%" data-day="周一"></div>
+                    <div class="mood-bar" style="height: 20%" data-day="周二"></div>
+                    <div class="mood-bar" style="height: 20%" data-day="周三"></div>
+                    <div class="mood-bar" style="height: 20%" data-day="周四"></div>
+                    <div class="mood-bar" style="height: 20%" data-day="周五"></div>
+                    <div class="mood-bar" style="height: 20%" data-day="周六"></div>
+                    <div class="mood-bar" style="height: 20%" data-day="周日"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-capsule" class="page">
+            <div class="section-ios">
+                <div class="section-header">创建时光胶囊</div>
+                <div class="card-ios">
+                    <textarea class="textarea-ios" id="capsule-text" placeholder="写一封给未来自己的信..."></textarea>
+                    <input type="date" class="input-ios" id="capsule-date">
+                    <button class="btn-ios" onclick="createCapsule()">封装胶囊 🎁</button>
+                </div>
+            </div>
+
+            <div class="section-ios">
+                <div class="section-header">等待开启的胶囊</div>
+                <div id="pending-capsules">
+                    <div class="empty-state">
+                        <i class="fas fa-envelope-open"></i>
+                        <p>暂无待开启的胶囊</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-ios">
+                <div class="section-header">已开启的胶囊</div>
+                <div id="opened-capsules">
+                    <div class="empty-state">
+                        <i class="fas fa-archive"></i>
+                        <p>暂无已开启的胶囊</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-bar">
+        <div class="tab-item active" data-page="inspiration" onclick="switchTab(this)">
+            <i class="fas fa-lightbulb"></i>
+            <span>灵感</span>
+        </div>
+        <div class="tab-item" data-page="art" onclick="switchTab(this)">
+            <i class="fas fa-palette"></i>
+            <span>艺术</span>
+        </div>
+        <div class="tab-item" data-page="mood" onclick="switchTab(this)">
+            <i class="fas fa-heart"></i>
+            <span>心情</span>
+        </div>
+        <div class="tab-item" data-page="capsule" onclick="switchTab(this)">
+            <i class="fas fa-envelope"></i>
+            <span>时光</span>
+        </div>
+    </div>
+
+    <div class="watermark">南京 · 金陵</div>
+    <div class="jinling-toast" id="toast"></div>
+
+    <script>
+let inspirations = [];
+let moods = [];
+let capsules = [];
+let selectedLandmark = null;
+let selectedEmotion = null;
+let currentArt = null;
+let canvas, ctx;
+
+const landmarkNames = {
+    mingxiaoling: '明孝陵',
+    xuanwuhu: '玄武湖',
+    zhonghuamen: '中华门',
+    zijinshan: '紫金山',
+    qinhuai: '秦淮河',
+    puluji: '夫子庙'
+};
+
+const colorTemplates = {
+    nanjing: {
+        gradient: ['#1a1a2e', '#16213e'],
+        accent: '#c41e3a',
+        secondary: '#d4a84b'
+    },
+    river: {
+        gradient: ['#0f3460', '#1a5f7a', '#57c5b6'],
+        accent: '#57c5b6',
+        secondary: '#ffd700'
+    },
+    mountain: {
+        gradient: ['#2c3e50', '#34495e', '#7f8c8d'],
+        accent: '#e74c3c',
+        secondary: '#2d5a27'
+    },
+    imperial: {
+        gradient: ['#c41e3a', '#8b0000', '#2c2c2c'],
+        accent: '#d4a84b',
+        secondary: '#c41e3a'
+    },
+    elegant: {
+        gradient: ['#f5f0e6', '#d4a84b', '#8b6914'],
+        accent: '#2d5a27',
+        secondary: '#d4a84b'
+    },
+    moonlight: {
+        gradient: ['#1e3a5f', '#4a7c6f', '#f5f0e6'],
+        accent: '#f5f0e6',
+        secondary: '#4a7c6f'
+    }
+};
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('art-canvas')) {
+        initCanvas();
+        loadData();
+        updateStats();
+        checkCapsules();
+    }
+});
+
+function initCanvas() {
+    canvas = document.getElementById('art-canvas');
+    ctx = canvas.getContext('2d');
+    
+    document.fonts.ready.then(() => {
+        resizeCanvas();
+        generateArt('nanjing');
+    });
+}
+
+function resizeCanvas() {
+    if (canvas && currentArt) {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        generateArt(currentArt);
+    }
+}
+
+window.addEventListener('resize', resizeCanvas);
+
+function switchTab(el) {
+    document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('page-' + el.dataset.page).classList.add('active');
+}
+
+function selectLandmark(el) {
+    document.querySelectorAll('.grid-item').forEach(item => item.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedLandmark = el.dataset.landmark;
+}
+
+function generateArt(type) {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const patterns = {
+        nanjing: () => {
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#1a1a2e');
+            gradient.addColorStop(1, '#16213e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for(let i = 0; i < 80; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height * 0.7;
+                const size = Math.random() * 4 + 1;
+                const hue = Math.random() * 30 + 330;
+                ctx.fillStyle = `hsla(${hue}, 80%, 70%, ${Math.random() * 0.8 + 0.2})`;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            drawNanjingText();
+            drawCornerDecorations();
+        },
+        river: () => {
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#0f3460');
+            gradient.addColorStop(0.5, '#1a5f7a');
+            gradient.addColorStop(1, '#57c5b6');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for(let i = 0; i < 15; i++) {
+                const y = canvas.height * 0.3 + i * 20;
+                ctx.strokeStyle = `rgba(255, 215, 0, ${0.3 - i * 0.02})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                for(let x = 0; x < canvas.width; x += 20) {
+                    ctx.lineTo(x, y + Math.sin(x * 0.02 + i) * 10);
+                }
+                ctx.stroke();
+            }
+            
+            drawRiverText();
+            drawCornerDecorations();
+        },
+        mountain: () => {
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#2c3e50');
+            gradient.addColorStop(0.4, '#34495e');
+            gradient.addColorStop(1, '#7f8c8d');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for(let i = 0; i < 5; i++) {
+                const baseY = canvas.height * 0.5 + i * 30;
+                ctx.fillStyle = `rgba(44, 62, 80, ${1 - i * 0.15})`;
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height);
+                ctx.lineTo(canvas.width * 0.2 * (i + 1), baseY);
+                ctx.lineTo(canvas.width * 0.5, baseY - 50);
+                ctx.lineTo(canvas.width * 0.8, baseY + 20);
+                ctx.lineTo(canvas.width, baseY - 30);
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            drawMountainText();
+            drawCornerDecorations();
+        },
+        mint: () => {
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#2d5a27');
+            gradient.addColorStop(1, '#4a7c6f');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for(let i = 0; i < 30; i++) {
+                const x = Math.random() * canvas.width;
+                const y = canvas.height * 0.3 + Math.random() * canvas.height * 0.5;
+                const size = Math.random() * 30 + 20;
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.1 + 0.05})`;
+                ctx.beginPath();
+                ctx.ellipse(x, y, size, size * 0.6, Math.random() * Math.PI, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            drawMintText();
+            drawCornerDecorations();
+        },
+        imperial: () => {
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#c41e3a');
+            gradient.addColorStop(0.5, '#8b0000');
+            gradient.addColorStop(1, '#2c2c2c');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for(let i = 0; i < 20; i++) {
+                ctx.strokeStyle = `rgba(212, 168, 75, ${0.3 - i * 0.015})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                const x = canvas.width * 0.2 + (canvas.width * 0.6) * (i / 20);
+                ctx.moveTo(x, canvas.height * 0.2);
+                ctx.lineTo(x, canvas.height * 0.8);
+                ctx.stroke();
+            }
+            
+            drawImperialText();
+            drawCornerDecorations();
+        },
+        elegant: () => {
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#f5f0e6');
+            gradient.addColorStop(1, '#d4a84b');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            for(let i = 0; i < 25; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                ctx.fillStyle = `rgba(139, 69, 19, ${Math.random() * 0.15 + 0.05})`;
+                ctx.beginPath();
+                ctx.arc(x, y, Math.random() * 3 + 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            drawElegantText();
+            drawCornerDecorations();
+        },
+        moonlight: () => {
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#1e3a5f');
+            gradient.addColorStop(0.5, '#4a7c6f');
+            gradient.addColorStop(1, '#f5f0e6');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = 'rgba(255, 255, 230, 0.9)';
+            ctx.beginPath();
+            ctx.arc(canvas.width * 0.8, canvas.height * 0.2, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            for(let i = 0; i < 50; i++) {
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.3})`;
+                ctx.beginPath();
+                ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height * 0.5, Math.random() * 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            drawMoonlightText();
+            drawCornerDecorations();
+        }
+    };
+
+    if(patterns[type]) {
+        patterns[type]();
+        currentArt = type;
+        canvas.style.filter = 'none';
+        
+        const buttons = document.querySelectorAll('.art-controls .art-btn');
+        const typeMap = {
+            nanjing: 0,
+            river: 1,
+            mountain: 2,
+            mint: 3,
+            imperial: 4,
+            elegant: 5,
+            moonlight: 6
+        };
+        
+        buttons.forEach((btn, index) => {
+            if(index === typeMap[type]) {
+                btn.classList.add('primary');
+            } else {
+                btn.classList.remove('primary');
+            }
+        });
+    }
+}
+
+function drawNanjingText() {
+    ctx.font = 'bold 24px "Noto Serif SC", serif';
+    ctx.fillStyle = '#d4a84b';
+    ctx.textAlign = 'center';
+    ctx.fillText('金陵花雨', canvas.width / 2, canvas.height * 0.15);
+    
+    ctx.font = '12px "Noto Serif SC", serif';
+    ctx.fillStyle = 'rgba(212, 168, 75, 0.6)';
+    ctx.fillText('Nanjing · Memory', canvas.width / 2, canvas.height * 0.2);
+}
+
+function drawRiverText() {
+    ctx.font = 'bold 24px "Noto Serif SC", serif';
+    ctx.fillStyle = '#ffd700';
+    ctx.textAlign = 'center';
+    ctx.fillText('秦淮灯影', canvas.width / 2, canvas.height * 0.15);
+    
+    ctx.font = '12px "Noto Serif SC", serif';
+    ctx.fillStyle = 'rgba(255, 215, 0, 0.6)';
+    ctx.fillText('Qinhuai · Lights', canvas.width / 2, canvas.height * 0.2);
+}
+
+function drawMountainText() {
+    ctx.font = 'bold 24px "Noto Serif SC", serif';
+    ctx.fillStyle = '#7f8c8d';
+    ctx.textAlign = 'center';
+    ctx.fillText('紫金云霞', canvas.width / 2, canvas.height * 0.15);
+    
+    ctx.font = '12px "Noto Serif SC", serif';
+    ctx.fillStyle = 'rgba(127, 140, 141, 0.6)';
+    ctx.fillText('Purple Mountain', canvas.width / 2, canvas.height * 0.2);
+}
+
+function drawMintText() {
+    ctx.font = 'bold 24px "Noto Serif SC", serif';
+    ctx.fillStyle = '#f5f0e6';
+    ctx.textAlign = 'center';
+    ctx.fillText('梧桐叶语', canvas.width / 2, canvas.height * 0.15);
+    
+    ctx.font = '12px "Noto Serif SC", serif';
+    ctx.fillStyle = 'rgba(245, 240, 230, 0.6)';
+    ctx.fillText('Plane Tree · City', canvas.width / 2, canvas.height * 0.2);
+}
+
+function drawImperialText() {
+    ctx.font = 'bold 24px "Noto Serif SC", serif';
+    ctx.fillStyle = '#d4a84b';
+    ctx.textAlign = 'center';
+    ctx.fillText('帝王气象', canvas.width / 2, canvas.height * 0.15);
+    
+    ctx.font = '12px "Noto Serif SC", serif';
+    ctx.fillStyle = 'rgba(212, 168, 75, 0.6)';
+    ctx.fillText('Imperial Majesty', canvas.width / 2, canvas.height * 0.2);
+}
+
+function drawElegantText() {
+    ctx.font = 'bold 24px "Noto Serif SC", serif';
+    ctx.fillStyle = '#8b6914';
+    ctx.textAlign = 'center';
+    ctx.fillText('雅致古都', canvas.width / 2, canvas.height * 0.15);
+    
+    ctx.font = '12px "Noto Serif SC", serif';
+    ctx.fillStyle = 'rgba(139, 105, 20, 0.6)';
+    ctx.fillText('Elegant Ancient City', canvas.width / 2, canvas.height * 0.2);
+}
+
+function drawMoonlightText() {
+    ctx.font = 'bold 24px "Noto Serif SC", serif';
+    ctx.fillStyle = '#f5f0e6';
+    ctx.textAlign = 'center';
+    ctx.fillText('月下金陵', canvas.width / 2, canvas.height * 0.15);
+    
+    ctx.font = '12px "Noto Serif SC", serif';
+    ctx.fillStyle = 'rgba(245, 240, 230, 0.6)';
+    ctx.fillText('Moonlight Nanjing', canvas.width / 2, canvas.height * 0.2);
+}
+
+function drawCornerDecorations() {
+    ctx.strokeStyle = 'rgba(212, 168, 75, 0.3)';
+    ctx.lineWidth = 2;
+    
+    ctx.beginPath();
+    ctx.arc(20, 20, 15, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(canvas.width - 20, canvas.height - 20, 15, 0, Math.PI * 2);
+    ctx.stroke();
+}
+
+function applyColorTemplate(template) {
+    generateArt(template);
+    showJinlingToast(colorTemplates[template].secondary + ' 配色已应用');
+}
+
+function applyFilter(filter, btnEl) {
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    btnEl.classList.add('active');
+    
+    const filters = {
+        none: 'none',
+        vintage: 'sepia(0.4) contrast(1.1)',
+        dramatic: 'contrast(1.3) saturate(1.2)',
+        moonlight: 'brightness(1.1) saturate(0.8) hue-rotate(180deg)'
+    };
+    canvas.style.filter = filters[filter] || 'none';
+}
+
+function saveArtwork() {
+    if(!currentArt) {
+        showJinlingToast('请先生成艺术作品');
+        return;
+    }
+    
+    const link = document.createElement('a');
+    link.download = '金陵时光机-' + currentArt + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showJinlingToast('作品已保存！');
+}
+
+function saveInspiration() {
+    const text = document.getElementById('inspiration-text').value.trim();
+    if(!selectedLandmark) {
+        showJinlingToast('请选择灵感地标');
+        return;
+    }
+    if(!text) {
+        showJinlingToast('请输入灵感内容');
+        return;
+    }
+
+    const inspiration = {
+        id: Date.now(),
+        landmark: selectedLandmark,
+        landmarkName: landmarkNames[selectedLandmark],
+        text: text,
+        timestamp: new Date().toLocaleString('zh-CN')
+    };
+
+    inspirations.unshift(inspiration);
+    localStorage.setItem('nj-inspirations', JSON.stringify(inspirations));
+    
+    document.getElementById('inspiration-text').value = '';
+    document.querySelectorAll('.grid-item').forEach(item => item.classList.remove('selected'));
+    selectedLandmark = null;
+    
+    renderInspirations();
+    showJinlingToast('灵感已保存！');
+}
+
+function renderInspirations() {
+    const container = document.getElementById('inspiration-list');
+    if (!container) return;
+    
+    if(inspirations.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-feather-alt"></i>
+                <p>暂无灵感记录<br>去探索南京的美吧！</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = inspirations.map(item => `
+        <div class="idea-card">
+            <span class="tag">${escapeHtml(item.landmarkName)}</span>
+            <p>${escapeHtml(item.text)}</p>
+            <div class="time">${escapeHtml(item.timestamp)}</div>
+        </div>
+    `).join('');
+}
+
+function selectEmotion(emotion) {
+    document.querySelectorAll('.emotion-btn').forEach(btn => btn.classList.remove('selected'));
+    document.querySelector(`.emotion-btn[data-emotion="${emotion}"]`).classList.add('selected');
+    selectedEmotion = emotion;
+}
+
+function saveMood() {
+    const note = document.getElementById('mood-note').value.trim();
+    if(!selectedEmotion) {
+        showJinlingToast('请选择心情');
+        return;
+    }
+
+    const mood = {
+        id: Date.now(),
+        emotion: selectedEmotion,
+        note: note,
+        date: new Date().toLocaleDateString('zh-CN')
+    };
+
+    moods.unshift(mood);
+    localStorage.setItem('nj-moods', JSON.stringify(moods));
+    
+    document.getElementById('mood-note').value = '';
+    document.querySelectorAll('.emotion-btn').forEach(btn => btn.classList.remove('selected'));
+    selectedEmotion = null;
+    
+    updateStats();
+    showJinlingToast('心情已记录！');
+}
+
+function updateStats() {
+    const totalMoods = moods.length;
+    const happyDays = moods.filter(m => m.emotion === 'happy').length;
+    
+    const totalMoodsEl = document.getElementById('total-moods');
+    const happyDaysEl = document.getElementById('happy-days');
+    const streakEl = document.getElementById('streak');
+    
+    if (totalMoodsEl) totalMoodsEl.textContent = totalMoods;
+    if (happyDaysEl) happyDaysEl.textContent = happyDays;
+    if (streakEl) streakEl.textContent = calculateStreak();
+
+    updateMoodChart();
+}
+
+function calculateStreak() {
+    if(moods.length === 0) return 0;
+    
+    const uniqueDates = [...new Set(moods.map(m => m.date))].sort((a, b) => new Date(b) - new Date(a));
+    
+    if(uniqueDates.length === 0) return 0;
+    
+    let streak = 1;
+    
+    for(let i = 1; i < uniqueDates.length; i++) {
+        const current = new Date(uniqueDates[i]);
+        const prev = new Date(uniqueDates[i - 1]);
+        const diff = (prev - current) / (1000 * 60 * 60 * 24);
+        
+        if(diff === 1) {
+            streak++;
+        } else {
+            break;
+        }
+    }
+    
+    return streak;
+}
+
+function updateMoodChart() {
+    const emotionValues = {
+        happy: 90,
+        excited: 80,
+        peaceful: 70,
+        melancholy: 40,
+        anxious: 30
+    };
+
+    const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+    const bars = document.querySelectorAll('.mood-bar');
+    
+    bars.forEach((bar, index) => {
+        const dayName = days[index];
+        const dayMoods = moods.filter(m => {
+            const dayOfWeek = new Date(m.date).getDay();
+            const mappedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            return days[mappedDay] === dayName;
+        });
+
+        if(dayMoods.length > 0) {
+            const avgValue = dayMoods.reduce((sum, m) => sum + (emotionValues[m.emotion] || 50), 0) / dayMoods.length;
+            bar.style.height = Math.max(avgValue, 10) + '%';
+        } else {
+            bar.style.height = '10%';
+        }
+    });
+}
+
+function createCapsule() {
+    const text = document.getElementById('capsule-text').value.trim();
+    const date = document.getElementById('capsule-date').value;
+    
+    if(!text) {
+        showJinlingToast('请输入胶囊内容');
+        return;
+    }
+    if(!date) {
+        showJinlingToast('请选择开启日期');
+        return;
+    }
+
+    const capsule = {
+        id: Date.now(),
+        text: text,
+        openDate: date,
+        createdDate: new Date().toISOString(),
+        status: 'pending'
+    };
+
+    capsules.unshift(capsule);
+    localStorage.setItem('nj-capsules', JSON.stringify(capsules));
+    
+    document.getElementById('capsule-text').value = '';
+    document.getElementById('capsule-date').value = '';
+    
+    renderCapsules();
+    showJinlingToast('时光胶囊已创建！');
+}
+
+function renderCapsules() {
+    const pending = capsules.filter(c => c.status === 'pending');
+    const opened = capsules.filter(c => c.status === 'opened');
+
+    const pendingContainer = document.getElementById('pending-capsules');
+    const openedContainer = document.getElementById('opened-capsules');
+
+    if (!pendingContainer || !openedContainer) return;
+
+    if(pending.length === 0) {
+        pendingContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-envelope-open"></i>
+                <p>暂无待开启的胶囊</p>
+            </div>
+        `;
+    } else {
+        pendingContainer.innerHTML = pending.map(cap => `
+            <div class="capsule-card">
+                <div class="countdown-box">
+                    <div class="countdown-number" id="countdown-${cap.id}">--</div>
+                    <div class="countdown-label">天后开启</div>
+                </div>
+                <div class="date">创建于: ${new Date(cap.createdDate).toLocaleDateString('zh-CN')}</div>
+                <div class="date">开启日期: ${new Date(cap.openDate).toLocaleDateString('zh-CN')}</div>
+            </div>
+        `).join('');
+
+        pending.forEach(cap => updateCountdown(cap.id, cap.openDate));
+    }
+
+    if(opened.length === 0) {
+        openedContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-archive"></i>
+                <p>暂无已开启的胶囊</p>
+            </div>
+        `;
+    } else {
+        openedContainer.innerHTML = opened.map(cap => `
+            <div class="capsule-card opened">
+                <div class="message">${escapeHtml(cap.text)}</div>
+                <div class="date">开启于: ${new Date(cap.openDate).toLocaleDateString('zh-CN')}</div>
+            </div>
+        `).join('');
+    }
+}
+
+function updateCountdown(id, openDate) {
+    const open = new Date(openDate);
+    const now = new Date();
+    const diff = Math.ceil((open - now) / (1000 * 60 * 60 * 24));
+    
+    const el = document.getElementById(`countdown-${id}`);
+    if(el) {
+        el.textContent = diff > 0 ? diff : '今天';
+    }
+}
+
+function checkCapsules() {
+    const now = new Date();
+    
+    capsules.forEach(cap => {
+        if(cap.status === 'pending') {
+            const openDate = new Date(cap.openDate);
+            if(openDate <= now) {
+                cap.status = 'opened';
+            }
+        }
+    });
+
+    localStorage.setItem('nj-capsules', JSON.stringify(capsules));
+    renderCapsules();
+}
+
+function loadData() {
+    const savedInspirations = localStorage.getItem('nj-inspirations');
+    const savedMoods = localStorage.getItem('nj-moods');
+    const savedCapsules = localStorage.getItem('nj-capsules');
+
+    if(savedInspirations) inspirations = JSON.parse(savedInspirations);
+    if(savedMoods) moods = JSON.parse(savedMoods);
+    if(savedCapsules) capsules = JSON.parse(savedCapsules);
+
+    renderInspirations();
+    renderCapsules();
+}
+
+function showJinlingToast(message) {
+    const toast = document.getElementById('toast');
+    if(toast) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2500);
+    }
+}
+
+</script>
+</body>
+</html>
